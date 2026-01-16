@@ -28,5 +28,80 @@ Improved access speed (data can be read from the nearest node).
 Examples of technologies:
 
 HDFS (Hadoop Distributed File System), Amazon S3, Google File System, Ceph, Cassandra (for distributed databases).
+```
 
+#### Q-2
+```bash
+```
+
+#### Q-3
+```bash
+```
+
+#### Q-4
+```bash
+```
+
+#### Q-5
+```bash
+```
+
+#### Q-6
+```bash
+```
+
+#### Q-7
+```bash
+```
+
+#### Q-8
+```bash
+```
+
+#### Q-9
+```bash
+```
+
+#### Q-10
+```bash
+```
+
+#### Q-11
+```bash
+```
+
+#### Q-12
+```bash
+```
+
+#### Q-13
+```bash
+```
+
+#### Q-14
+```bash
+```
+
+#### Q-15
+```bash
+```
+
+#### Q-16
+```bash
+```
+
+#### Q-17
+```bash
+```
+
+#### Q-18
+```bash
+```
+
+#### Q-19
+```bash
+```
+
+#### Q-20
+```bash
 ```
