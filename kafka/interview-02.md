@@ -1,5 +1,16 @@
-#### Q-1
+#### Q-1 What Do ISR and AR represent in Kafka? What does ISR expansion mean ?
 ```bash
+ISR (in-sync replicas)
+ISR refers to the replicas that are fully synchronized with the leader replica. These replicas have the latest 
+data and are considered reliable for both read and write operations.
+
+AR (assigned replicas)
+AR includes all replicas assigned to a partition, both in-sync and out-of-sync replicas. It represents the complete 
+set of replicas for a partition.
+
+ISR expansion
+ISR expansion occurs when new replicas catch up with the leader and are added to the ISR list. This increases the 
+number of up-to-date replicas, improving fault tolerance and reliability.
 ```
 
 #### Q-2
