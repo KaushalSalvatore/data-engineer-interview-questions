@@ -119,26 +119,77 @@ Offset: A unique identifier for the position of the message within a partition. 
 track of which messages they have processed.
 ```
 
-#### Q-15
+#### Q-15 How do you configure Kafka to produce data with a specific key ?
 ```bash
+Steps to configure:
+
+Producer Configuration: In your producer configuration, set the key.serializer and value.serializer to appropriate 
+serializers (e.g., StringSerializer or ByteArraySerializer).
+
+Producer API: When producing messages using the producer API, you can specify the key along with the message value. 
+The producer will then use this key for partitioning.
+
+ProducerRecord<String, String> record = new ProducerRecord<>("topic", "key1", "value1");
+producer.send(record);
 ```
 
-#### Q-16
+#### Q-16 What are Kafka’s default retention policies and how can they be customized ?
 ```bash
+afka retains messages for 7 days and deletes messages based on the size of the logs or the retention time. 
+The default configurations are:
+
+Retention Time:
+The default retention time is log.retention.ms=16800000 (7 days).
+
+Retention Size:
+The default retention size is log.retention.bytes=-1, meaning there is no disk size limit for retention.
+
+How to Customize:
+
+kafka-topics.sh --alter --topic my-topic --config retention.ms=3600000 --bootstrap-server localhost:9092
+kafka-topics.sh --alter --topic my-topic --config retention.bytes=500000000 --bootstrap-server localhost:9092
 ```
 
-#### Q-17
+#### Q-17 How do you tune Kafka for fault tolerance in a distributed environment ? 
 ```bash
+eplication Factor: Set an appropriate replication factor (e.g., replication.factor=3) for each topic. This ensures that 
+data is replicated across multiple brokers, reducing the risk of data loss in case of broker failure.
+
+In-Sync Replicas (ISR): Ensure that the number of in-sync replicas (ISR) is sufficient. Kafka guarantees that only in-sync replicas can serve as leaders, ensuring that data is available even if some brokers fail.
+
+Leader Election: Enable automatic leader election for partitions to ensure that a new leader is chosen when a broker fails. 
+You can tune min.insync.replicas to define the minimum number of replicas that must acknowledge a write for the write to be considered successful.
+
+Producer Retries: Enable producer retries (retries=3) to ensure that temporary network issues do not result in data loss. 
+Setting acks=all ensures that retries are consistent across replicas.
+
+Disk I/O Optimization: Ensure that brokers have adequate disk I/O performance. Use high-performance SSDs for faster 
+read/write access.
+
+Monitoring and Alerts: Set up monitoring and alerts for potential issues such as under-replicated partitions, broker failures, 
+or disk usage thresholds to take proactive action before failures impact availability.
 ```
 
-#### Q-18
+#### Q-18 What is the need for message compression in Apache Kafka ?
 ```bash
+Due to reduced size, it reduces the latency in which messages are sent to Kafka.
+Reduced bandwidth allows the producers to send more net messages to the broker.
+When the data is stored in Kafka via cloud platforms, it can reduce the cost in cases where the cloud 
+services are paid.
+Message compression leads to reduced disk load, which will lead to faster read and write requests.
 ```
 
-#### Q-19
+#### Q-19 Can a consumer read more than one partition from a topic ?
 ```bash
+Yes, if the number of partitions is greater than the number of consumers in a consumer group, then a consumer 
+will have to read more than one partition from a topic.
 ```
 
-#### Q-20
+#### Q-20 What are the responsibilities of a Controller Broker in Kafka ?
 ```bash
+creating and deleting topics
+Adding partitions and assigning leaders to the partitions
+Managing the brokers in a cluster - adding new brokers, active broker shutdown, and broker failures
+Leader Election
+Reallocation of partitions.
 ```

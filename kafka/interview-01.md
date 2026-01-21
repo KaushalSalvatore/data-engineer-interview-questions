@@ -155,6 +155,17 @@ Kafka can handle message retention across multiple data centers through a featur
 is a stand-alone tool for copying data between Kafka clusters. It consumes from one cluster and produces to another, 
 allowing for replication of data across different data centers. This can be used for disaster recovery, geographic 
 distribution of data, or aggregating data from multiple sources into a central location.
+
+ configuration settings for retention : 
+
+ log.retention.hours: The default retention period is 168 hours (7 days), meaning messages in Kafka topics will be 
+ retained for 7 days by default. After that, older messages are automatically deleted.
+
+log.retention.bytes: This parameter controls the total disk space to be used for a topic's log files. Once this size 
+is exceeded, older messages are purged.
+
+log.segment.bytes: This defines the maximum size of a log segment file. Once a segment reaches this size, it’s rolled 
+over, and a new file is created for new messages.
 ```
 
 #### Q-15 How do Partitions work in Kafka ?
