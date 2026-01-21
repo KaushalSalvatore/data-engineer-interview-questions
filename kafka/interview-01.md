@@ -14,12 +14,35 @@ indispensable for distributed systems and real-time analytics.
 
 #### Q-2 What are the key components of Kafka ?
 ```bash
-Producer: Publishes messages to Kafka topics.
-Consumer: Subscribes to topics and processes the published messages.
-Broker: A Kafka server that stores and manages topics.
-ZooKeeper: Manages and coordinates Kafka brokers.
-Topic: A category or feed name to which records are published.
-Partition: Topics are divided into partitions for scalability.
+Producer: A producer is any entity that sends messages (also called records) to Kafka topics. Producers 
+are responsible for creating and pushing messages into Kafka brokers. Producers can publish messages to
+specific partitions within a topic and can also apply message batching and compression.
+
+Consumer: A consumer is an entity that reads messages from Kafka topics. Consumers subscribe to one or more 
+Kafka topics and process the messages they receive. Consumers typically belong to a consumer group, which 
+ensures that each message is processed by one consumer in the group.
+
+Brokers: Kafka brokers are the servers that store and manage messages. They also handle the distribution of 
+partitions across a Kafka cluster. Brokers ensure that data is stored, replicated, and made available for 
+consumers. A Kafka cluster consists of multiple brokers working together.
+
+Topics: A topic is a logical channel to which producers send messages and consumers read from. Each topic is 
+split into multiple partitions for scalability and parallelism. Topics allow data to be organized logically, 
+and each topic can hold messages of a particular kind (e.g., user events, logs).
+
+Partitions: Kafka topics are split into partitions, which allow Kafka to scale horizontally. Partitions enable 
+parallelism by allowing different consumers to read different parts of the topic simultaneously. Each partition 
+has an ordered sequence of messages.
+
+Zookeeper: Kafka relies on Apache Zookeeper to manage distributed coordination tasks such as leader election for 
+partitions, tracking offsets, and maintaining cluster metadata. Zookeeper ensures that Kafka brokers are aware of 
+each other’s status and configuration.
+
+Kafka Connect: Kafka Connect is a framework for connecting Kafka to external systems such as databases, file systems, 
+and other message queues. It provides pre-built connectors and allows developers to build custom connectors.
+
+Kafka Streams: Kafka Streams is a client library for building real-time stream processing applications on top of Kafka. 
+It provides simple APIs for consuming, transforming, and producing data in real-time.
 ```
 
 #### Q-3 What is a topic in Kafka ?
@@ -27,6 +50,12 @@ Partition: Topics are divided into partitions for scalability.
 A topic in Kafka is a category or feed name to which records are published. Topics in Kafka are always multi-subscriber
 that is, a topic can have zero, one, or many consumers that subscribe to the data written to it. Topics are split into 
 partitions for improved scalability and parallel processing.
+
+Key characteristics of Kafka topics:
+Partitioning
+Durability
+Topic Names
+Retention Policy
 ```
 
 #### Q-4 What is a partition in Kafka ?
@@ -48,6 +77,12 @@ keeps track of the status of Kafka cluster nodes, Kafka topics, and partitions.
 A broker is a Kafka server that runs in a Kafka cluster. It receives messages from producers, assigns offsets 
 to them, and commits the messages to storage on disk. It also services consumers, responding to fetch requests
 for partitions and responding with the messages that have been published.
+
+Key responsibilities of a Kafka broker:
+Message Storage
+Partition Management
+Cluster Coordination
+Serving Clients
 ```
 
 #### Q-7 How does Kafka ensure fault tolerance ?
@@ -55,6 +90,9 @@ for partitions and responding with the messages that have been published.
 Kafka ensures fault tolerance through data replication. Each partition is replicated across a configurable number 
 of servers for fault tolerance. One of the servers is designated as the leader, which handles all read and write 
 requests for the partition, while the others are followers that passively replicate the leader.
+
+In Kafka, data is stored across multiple nodes in the cluster. There is a high probability of one of the nodes 
+failing. Fault tolerance means that the system is protected and available even when nodes in the cluster fail.
 ```
 
 #### Q-8  What is the difference between a Kafka consumer and consumer group ?
@@ -85,6 +123,15 @@ Brokers can be added to a cluster to increase capacity, and the cluster can be s
 Kafka handles data retention through configurable retention policies. These can be based on time (e.g., retain data 
 for 7 days) or size (e.g., retain up to 1GB per partition). After the retention limit is reached, old messages
 are discarded. Kafka also supports log compaction for topics where only the latest value for each key is needed.
+
+Kafka’s message retention policy
+
+Time-based Retention: The most common retention policy, which is based on time. Kafka can be configured to 
+retain messages for a specified period, such as 7 days. Messages older than the retention period are deleted 
+automatically. 
+
+Size-based Retention: Kafka can also retain messages based on the total size of the log for each partition. 
+When the log size exceeds a specified limit, Kafka will delete the oldest messages to free up space.
 ```
 
 #### Q-12 What is the difference between a Kafka consumer and a Kafka streams application ?
@@ -144,6 +191,9 @@ from different partitions in parallel, which improves Kafka's scalability and ef
 Replicas, on the other hand, provide redundancy by creating copies of partitions across multiple brokers. 
 This ensures fault tolerance because, in the event of a leader broker failure (the broker managing read and 
 write operations for a partition), one of the follower replicas can be promoted to take over as the new leader. 
+
+Partition is a single piece of Kafka topic. More partitions allow excellent parallelism when reading from the topics. 
+The number of partitions is configured based on per topic.
 ```
 
 #### Q-18 What is a schema in Kafka, and why is it important for distributed systems ? 
