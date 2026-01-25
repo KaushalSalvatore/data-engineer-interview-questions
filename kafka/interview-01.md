@@ -5,7 +5,7 @@ processing streams of records in real-time. It's designed to handle high-through
 scalable data pipelines. Kafka is often used for building real-time data pipelines and streaming applications.
 
 While RabbitMQ focuses on real-time message delivery without storing messages long-term, Kafka's retention policy 
-supports more complex, data-driven applications. 
+supports more complex, data-driven applications.  
 
 Common use cases for Kafka include application tracking, log aggregation, and messaging, though it lacks traditional 
 database features like querying and indexing. Its strength lies in handling real-time data streams, making it 

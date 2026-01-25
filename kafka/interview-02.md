@@ -193,3 +193,4 @@ Managing the brokers in a cluster - adding new brokers, active broker shutdown, 
 Leader Election
 Reallocation of partitions.
 ```
+

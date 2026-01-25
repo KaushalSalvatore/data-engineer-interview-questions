@@ -9,7 +9,6 @@ docker ps
 ```bash
 docker exec -it kafka bash 
 cd /opt/kafka/bin
-
 ls (list of inside folder)
 ```
 
