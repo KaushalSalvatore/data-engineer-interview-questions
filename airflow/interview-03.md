@@ -88,15 +88,16 @@ schedule_interval='* * * * *',
 ![image_01](./images/image_08.png)
 
 
-#### Q-12
+#### Q-12 How can you trigger DAGs in Airflow, and what are the different ways to do so ?
+```bash
+
+```
+
+#### Q-13 What is Branching in Directed Acyclic Graphs (DAGs) ?
 ```bash
 ```
 
-#### Q-13
-```bash
-```
-
-#### Q-14
+#### Q-14 How do you ensure that an Airflow workflow is idempotent ?
 ```bash
 ```
 
@@ -120,6 +121,6 @@ schedule_interval='* * * * *',
 ```bash
 ```
 
-#### Q-20
+#### Q-20 
 ```bash
 ```
