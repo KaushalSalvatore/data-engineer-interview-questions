@@ -62,16 +62,88 @@ Step Functions are great for orchestrating AWS services.
 Airflow excels at complex data pipelines and scheduling logic.
 ```
 
-#### Q-4
+#### Q-4 What is Dimensional Modeling ?  
 ```bash
+Dimensional modeling is a data-warehouse design technique used to organize data for analytics and reporting.
+It structures data into fact tables that store measurable business metrics and dimension tables that store 
+descriptive attributes.
+The goal is to make queries simple, fast, and easy for business users to understand.
+
+1. Fact Table
+Fact tables store quantitative measures like sales amount, quantity, or revenue, along with foreign keys to 
+dimensions.
+
+Examples:
+sales_amount
+order_count
+profit
+
+2️. Dimension Table
+Dimension tables store descriptive attributes used for filtering and grouping.
+
+Examples:
+Customer (name, age, city)
+Product (category, brand)
+Date (day, month, year)
 ```
 
-#### Q-5
+#### Q-5 Design Dimensional modeling for social media ? 
 ```bash
+For social media, I would use dimensional modeling with fact tables to capture user activities like posts, 
+likes, comments, and shares, and dimension tables to describe users, content, time, and platform attributes.
+The design focuses on analytics such as engagement, growth, and content performance.
+
+                    Dim_User
+          ┌────────────────────────┐
+          │ user_id (PK)           │
+          │ username               │
+          │ age                    │
+          │ gender                 │
+          │ country                │
+          │ signup_date            │
+          └──────────┬─────────────┘
+                     │
+                     │
+Dim_Time      ┌───────▼───────────┐       Dim_Post
+┌──────────┐  │Fact_User_Activity │  ┌───────────────┐
+│ time_id  │  │-------------------│  │ post_id (PK)  │
+│ date     │  │ user_id (FK)      │  │ post_type     │
+│ day      │◄─┤ post_id (FK)      ├─►│ category      │
+│ month    │  │ time_id (FK)      │  │ created_date  │
+│ year     │  │ device_id (FK)    │  └───────────────┘
+└──────────┘  │                   │
+              │ like_count        │
+              │ comment_count     │
+              │ share_count       │
+              │ view_count        │
+              └─────────┬─────────┘
+                        │
+                        │
+                 Dim_Device
+          ┌────────────────────────┐
+          │ device_id (PK)         │
+          │ device_type            │
+          │ OS                     │
+          │ app_version            │
+          └────────────────────────┘
 ```
 
-#### Q-6
+#### Q-6 how to explain upstream and downstream clearly and confidently ? 
 ```bash
+In a data pipeline, upstream refers to the systems or processes that provide input data, while downstream refers to 
+the systems or processes that consume the output data.
+Any change or failure upstream can impact downstream processes.
+
+Source Systems → Spark ETL → Data Warehouse → BI Dashboard
+   (Upstream)                    (Downstream)
+
+Upstream → Data producers
+Downstream → Data consumers
+Impact rule → Upstream issues propagate downstream
+
+For example, in a Spark ETL pipeline, the source database or Kafka topic is upstream.
+The Spark job itself is in the middle, and the data warehouse tables, dashboards, or reports that use the output 
+are downstream.
 ```
 
 #### Q-7

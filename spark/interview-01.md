@@ -22,16 +22,119 @@
 ```bash
 ```
 
-#### Q-7
+#### Q-7 Difference between client mode and cluster mode ? 
 ```bash
+1. Client Mode
+
+You run spark-submit from your laptop
+Driver runs on your laptop
+Executors run on cluster nodes
+
+Flow:
+Your machine (Driver) → Cluster Manager → Executors
+
+Characteristics:
+
+Driver logs appear on your local machine
+If your machine disconnects → job fails
+Good for development and debugging
+
+spark-submit --master yarn --deploy-mode client app.py
+
+2. Cluster Mode
+
+In cluster mode, the driver runs inside the cluster.
+
+Example:
+You submit job
+Cluster manager launches driver on a worker node
+Executors also run in cluster
+
+Flow:
+Cluster Manager → Driver (inside cluster) → Executors
+
+Characteristics:
+Driver runs inside cluster
+Job continues even if you disconnect
+Suitable for production
+Logs are inside cluster (YARN/K8s UI)
+
+spark-submit --master yarn --deploy-mode cluster app.py
 ```
 
-#### Q-8
+#### Q-8 What are the different types of cluster managers available in Spark ?
 ```bash
+cluster manager is responsible for allocating resources (CPU, memory) and launching executors for your Spark 
+application.
+
+1. Standalone Cluster Manager
+This is Spark’s built-in cluster manager.
+Comes with Spark
+Simple to set up
+Good for small clusters or testing
+Not commonly used in large enterprise environments
+
+Architecture:
+Master node
+Worker nodes
+
+Best for:
+Development
+Small-scale deployments
+
+2. Hadoop YARN (Yet Another Resource Negotiator)
+
+Very common in on-prem Hadoop environments.
+Used in Hadoop clusters
+Manages resources for multiple applications (not just Spark)
+Supports multi-tenant environments
+
+Two modes:
+Client mode
+Cluster mode
+
+Best for:
+Enterprises using Hadoop ecosystem
+
+3. Apache Mesos (Less Common Now)
+
+General-purpose cluster manager.
+Can run multiple distributed systems
+Supports Spark, Hadoop, Kafka, etc.
+
+Not widely used today compared to YARN or Kubernetes.
+
+4. Kubernetes (K8s)
+
+Modern and increasingly popular.
+Container-based resource management
+Cloud-native
+Works well in AWS, Azure, GCP
+Used heavily in modern data platforms
+
+Best for:
+Cloud environments
+Microservices architecture
+Containerized deployments
 ```
 
-#### Q-9
+#### Q-9 What is a Spark Driver, and what are its responsibilities ?
 ```bash
+The Spark Driver is the central coordinator of a Spark application. It creates the SparkSession, builds the execution 
+plan (DAG), splits it into stages and tasks, requests resources from the cluster manager, distributes tasks to executors, 
+monitors execution, and collects results. It does not process data itself but orchestrates the entire workflow.
+
+Every Spark application has one driver process, and it is responsible for planning, coordinating, and monitoring the execution 
+of your job.
+
+Think of it as the brain of the Spark application.
+
+Key Responsibilities of the Spark Driver
+1. Maintains SparkSession / SparkContext
+2. Converts Code into Execution Plan (DAG Creation)
+3. Requests Resources from Cluster Manager
+4. Distributes Tasks to Executors
+5. Collects Results
 ```
 
 #### Q-10 how can optimize quries in if they are take long time ?
@@ -117,7 +220,7 @@ df.cache()
 df.count()   # action triggers caching
 
 from pyspark import StorageLevel
-df.persist(StorageLevel.MEMORY_AND_DISK)
+df.persist(StorageLevel.MEMORY_AND_DISK) # df_from_csv.persist(storageLevel=StorageLevel.DISK_ONLY)
 df.count()
 
 “I use cache for quick reuse and persist when I need control over memory and disk usage.”
