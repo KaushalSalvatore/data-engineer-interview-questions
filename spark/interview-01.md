@@ -124,8 +124,8 @@ The Spark Driver is the central coordinator of a Spark application. It creates t
 plan (DAG), splits it into stages and tasks, requests resources from the cluster manager, distributes tasks to executors, 
 monitors execution, and collects results. It does not process data itself but orchestrates the entire workflow.
 
-Every Spark application has one driver process, and it is responsible for planning, coordinating, and monitoring the execution 
-of your job.
+Every Spark application has one driver process, and it is responsible for planning, coordinating, and monitoring the 
+execution of your job.
 
 Think of it as the brain of the Spark application.
 
@@ -244,7 +244,8 @@ Broadcasting a 1–2 GB table → ❌ OOM
 #### Q-16 how do you optimize this spark job to handle the skewed data ?
 ```bash
 To optimize a Spark job with skewed data, I first identify the skewed keys using the execution plan and Spark UI.
-Then I reduce the impact by using techniques like salting the skewed keys, applying broadcast joins where applicable, repartitioning on better keys, enabling Adaptive Query Execution, and handling skewed keys separately.
+Then I reduce the impact by using techniques like salting the skewed keys, applying broadcast joins where applicable, 
+repartitioning on better keys, enabling Adaptive Query Execution, and handling skewed keys separately.
 The goal is to balance the workload across executors and avoid long-running tasks.
 
 I enable AQE so Spark can automatically handle skewed joins and optimize shuffle partitions at runtime.

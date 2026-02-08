@@ -101,9 +101,10 @@ Each partition ≈ 10GB (roughly).
 Each partition is processed by one task.
 More partitions → more parallel tasks (up to cluster capacity).
 
-Partitioning in PySpark determines how data is distributed across executors. Proper partitioning improves parallelism, reduces 
-shuffle during joins and aggregations, prevents data skew, and enables partition pruning during reads. By aligning partition 
-strategy with query patterns, we can significantly reduce execution time and optimize resource utilization.
+Partitioning in PySpark determines how data is distributed across executors. Proper partitioning improves parallelism, 
+reduces shuffle during joins and aggregations, prevents data skew, and enables partition pruning during reads. 
+By aligning partition strategy with query patterns, we can significantly reduce execution time and optimize resource 
+utilization.
 
 Why Partitioning Matters for Performance
 
