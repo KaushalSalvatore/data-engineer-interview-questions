@@ -1,20 +1,185 @@
-#### Q-1
+#### Q-1 What is PySpark, and how does it differ from Apache Spark ?
 ```bash
+Apache Spark is a distributed data processing engine.
+It’s the core framework that provides:
+Distributed computation
+In-memory processing
+Fault tolerance
+APIs for batch, streaming, ML, and graph processing
+It is written in Scala and runs on the JVM.
+
+PySpark is the Python API for Apache Spark.
+It allows you to use Spark’s distributed processing engine using Python instead of Scala or Java.
+
+So:
+
+Spark = Engine
+PySpark = Python interface to that engine
+
+Language
+Spark core → Written in Scala (JVM-based)
+PySpark → Python wrapper around Spark
+
+Under the hood:
+Your PySpark code calls Spark JVM code through Py4J
+
+Performance
+
+Scala Spark → Slightly faster (native to JVM)
+PySpark → Slight overhead due to Python ↔ JVM communication
+
+However:
+
+When using DataFrames & Spark SQL → performance difference is minimal
+When using Python UDFs → can be slower due to serialization
 ```
 
-#### Q-2
+
+#### Q-2  pyspark architecture and component ?
 ```bash
+Spark follows a master-worker architecture where the Driver acts as the coordinator, the Cluster Manager allocates 
+resources, and Executors running on Worker Nodes execute tasks. When an action is triggered, the Driver builds a DAG, 
+splits it into stages and tasks, and distributes them to executors for parallel processing. Spark achieves fault 
+tolerance using lineage and improves performance using in-memory computation.
+
+The core components are:
+1. Driver
+2. Cluster Manager
+3. Executors
+4. Worker Nodes
+
+1. Driver (The Brain)
+The Driver is the central coordinator of a Spark application.
+
+It is responsible for:
+Creating SparkSession / SparkContext
+Building the DAG (execution plan)
+Dividing the job into stages and tasks
+Requesting resources from the cluster manager
+Sending tasks to executors
+Monitoring execution
+Collecting results
+
+Important:
+The driver does not process data — it coordinates.
+
+2. Cluster Manager (Resource Manager)
+The cluster manager is responsible for:
+Allocating CPU and memory
+Launching executors
+Managing resources across applications
+
+Supported cluster managers:
+Standalone
+YARN
+Kubernetes
+Mesos
+
+3. Worker Nodes
+
+Worker nodes are machines in the cluster that:
+Host executors
+Provide CPU & memory
+Perform actual computation
+
+4. Executors (The Workers)
+Executors run inside worker nodes.
+
+They:
+Execute tasks
+Store data in memory (cache)
+Perform shuffle operations
+Return results to driver
+
+Each executor:
+Has its own memory
+Has multiple cores
+Runs tasks in parallel
 ```
 
-#### Q-3
+#### Q-3 explain stage vs task vs job, which is one of the most commonly use in pyspark ? 
 ```bash
+JOB :-
+A job is triggered when you execute an action.
+Examples of actions:
+count()
+collect()
+show()
+write()
+Every time you call an action → Spark creates a new job
+
+Even though logic is similar, Spark creates two separate jobs because two actions were triggered.
+df.filter(df.age > 30).count()
+df.filter(df.age > 30).show()
+
+1 Action = 1 Job
+
+STAGE :-
+A stage is a set of tasks that can be executed without a shuffle.
+Spark divides a job into stages based on shuffle boundaries.
+There are two types of transformations:
+Narrow transformation (filter select map)
+Wide transformation (group by , join)
+
+TASK :-
+A task is the smallest unit of work.
+Each task processes one partition.
+
+If you have:
+100 partitions
+1 stage
+
+Then:
+100 tasks will be created for that stage
+Each task runs on an executor core.
+
+Job
+→ Multiple Stages
+→ Each Stage has Multiple Tasks
+→ Each Task processes One Partition
+
+You have 200 partitions and a job with 2 shuffles. How many tasks will run ?
+Answer:
+
+Each stage will have 200 tasks
+If 3 stages → 600 tasks total
 ```
 
-#### Q-4
+#### Q-4 What are RDDs in Spark? How do they differ from DataFrames ?
 ```bash
+RDD (Resilient Distributed Dataset) is the fundamental data abstraction in Spark.
+It is:
+Distributed → Data is split across multiple nodes
+Immutable → Cannot be changed once created
+Fault-tolerant → Uses lineage (DAG) for recomputation
+Low-level API
+
+A DataFrame is a higher-level abstraction built on top of RDDs.
+It is:
+Distributed
+Immutable
+Has a schema (column names & types)
+Optimized using Catalyst Optimizer
+Similar to a table in SQL
+
+1. Structure
+RDD → No schema (just objects)
+DataFrame → Structured with schema
+
+2.Optimization
+RDD → No automatic optimization
+DataFrame → Optimized using Catalyst & Tungsten
+
+3.API Level
+RDD → Low-level (functional programming style)
+DataFrame → High-level (SQL-like operations) 
+
+4.Performance
+RDD → Slower (no query optimization)
+DataFrame → Faster (better execution planning, code generation)
 ```
 
-#### Q-5
+#### Q-5 
 ```bash
 ```
 
@@ -270,14 +435,37 @@ df1 = df1.withColumn("salt", (rand()*10).cast("int"))
 df1 = df1.withColumn("join_key_salt", concat(col("key"), col("salt")))
 ```
 
-#### Q-18
+#### Q-18 What is a UDF (User Defined Function) in PySpark, and how do you use it ?
 ```bash
+UDFs are custom functions that you can define and use to apply transformations to DataFrame columns:
+
+from pyspark.sql.functions import udf
+from pyspark.sql.types import IntegerType
+
+def my_func(x):
+    return x + 1
+
+my_udf = udf(my_func, IntegerType())
+df = df.withColumn('new_column', my_udf(df['column']))
 ```
 
-#### Q-19
+#### Q-19 What is the difference between map and flatMap in PySpark ?
 ```bash
+map and flatMap are both RDD transformations in PySpark, but they differ in how they handle the output 
+of each element.
+
+map → one input element produces exactly one output element
+flatMap → one input element can produce zero, one, or many output elements
+
+input :- ["hello world", "spark"]
+After map(split):[["hello", "world"], ["spark"]]
+flatMap(split):["hello", "world", "spark"]
 ```
 
-#### Q-20
+#### Q-20 What are some common issues faced while running PySpark jobs on a cluster?
 ```bash
+Common issues in PySpark cluster jobs include executor or driver out-of-memory errors, data skew, excessive shuffle, 
+incorrect partitioning, Python UDF performance overhead, serialization problems, dependency mismatches, and executor 
+failures. Most of these issues can be diagnosed using Spark UI and resolved through proper partition tuning, broadcast 
+joins, memory configuration, and avoiding unnecessary shuffles.
 ```
