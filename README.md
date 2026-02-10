@@ -29,4 +29,4 @@ can be used for analytics, reporting, and machine learning.
 - Platform Engineering – Building data infrastructure
 - Analytics Engineering – Data modeling using tools like dbt
 
-![image_10](/images/image_10.png)
+![image_10](/images/image-10.png)
