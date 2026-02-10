@@ -179,12 +179,27 @@ RDD → Slower (no query optimization)
 DataFrame → Faster (better execution planning, code generation)
 ```
 
-#### Q-5 
+#### Q-5 Explain the use of StructType and StructField classes in PySpark with examples ?
 ```bash
+StructType represents the entire schema of a DataFrame.
+StructField represents one column in the schema.
+
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+schema = StructType([
+    StructField("name", StringType(), True),
+    StructField("age", IntegerType(), True)
+])
 ```
 
-#### Q-6
+#### Q-6 What are SparkFiles in Pyspark ? 
 ```bash
+SparkFiles in PySpark are used to distribute external files (like config files, lookup tables, JSON files, or scripts) 
+to all executor nodes in a Spark cluster.
+
+SparkFiles allow you to send small supporting files from the driver to all executors so they can access them locally 
+during task execution.
+
+spark.sparkContext.addFile("config.json")
 ```
 
 #### Q-7 Difference between client mode and cluster mode ? 

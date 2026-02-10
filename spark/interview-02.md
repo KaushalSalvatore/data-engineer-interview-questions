@@ -227,32 +227,165 @@ Catalyst combines filters into one:
 WHERE age > 30 AND salary > 5000
 ```
 
-#### Q-11
+#### Q-11 How can you perform incremental processing with PySpark ?
 ```bash
+1. Using a Timestamp (Most Common Method)
+last_processed = "2026-02-07 00:00:00"
+
+df = spark.read.parquet("s3://source/")
+incremental_df = df.filter(df.updated_at > last_processed)
+
+2️. Using Partition-Based Incremental Loads
+s3://data/year=2026/month=02/day=08/
+df = spark.read.parquet("s3://data/year=2026/month=02/day=08/")
+
+3. Incremental Processing with Delta Lake (Very Common in Databricks)
+Delta Lake supports:
+MERGE (Upsert)
+Change Data Feed (CDF)
 ```
 
-#### Q-12
+#### Q-12 What are the different ways to handle row duplication in a PySpark DataFrame ?
 ```bash
+1. dropDuplicates() (Most Common)
+df = df.dropDuplicates()
+2. distinct()
+df = df.distinct()
+3. Using Window Function (Best for Controlled Deduplication)
+4. Using groupBy + Aggregation
 ```
 
-#### Q-13
+#### Q-13 What is SparkConf in PySpark? List a few attributes of SparkConf ? 
 ```bash
+SparkConf is the configuration object used to set and manage Spark application settings before creating a 
+SparkContext or SparkSession.
+
+SparkConf is used to configure how your Spark application runs — including memory, cores, executors, app name, 
+and cluster settings
+
+Common Attributes of SparkConf
+1. Application Configuration
+| Property         | Description                                    |
+| ---------------- | ---------------------------------------------- |
+| `spark.app.name` | Name of the Spark application                  |
+| `spark.master`   | Cluster manager (local, yarn, k8s, standalone) |
+
+2. Executor Configuration
+| Property                        | Description                  |
+| ------------------------------- | ---------------------------- |
+| `spark.executor.instances`      | Number of executors          |
+| `spark.executor.memory`         | Memory per executor          |
+| `spark.executor.cores`          | Number of cores per executor |
+| `spark.executor.memoryOverhead` | Extra off-heap memory        |
+
+3. Driver Configuration
+| Property              | Description   |
+| --------------------- | ------------- |
+| `spark.driver.memory` | Driver memory |
+| `spark.driver.cores`  | Driver cores  |
+
+4. Shuffle Configuration
+| Property                       | Description                  |
+| ------------------------------ | ---------------------------- |
+| `spark.sql.shuffle.partitions` | Number of shuffle partitions |
+| `spark.shuffle.compress`       | Compress shuffle data        |
+
+5.Dynamic Allocation
+| Property                               | Description                       |
+| -------------------------------------- | --------------------------------- |
+| `spark.dynamicAllocation.enabled`      | Enable/disable dynamic allocation |
+| `spark.dynamicAllocation.minExecutors` | Minimum executors                 |
+| `spark.dynamicAllocation.maxExecutors` | Maximum executors                 |
 ```
 
-#### Q-14
+#### Q-14 What would happen if we lose RDD partitions due to the failure of the worker node ?
 ```bash
+If we lose RDD partitions due to a worker node failure, Spark does not lose the entire dataset permanently.
+
+If an RDD partition is lost due to worker node failure, Spark automatically recomputes the lost partitions using the 
+RDD’s lineage graph. Since RDDs are immutable and maintain a record of transformations, Spark can regenerate only the 
+missing partitions without restarting the entire job. This mechanism provides fault tolerance in Spark.
 ```
 
-#### Q-15
+#### Q-15 What are the different approaches for creating RDD in PySpark ?
 ```bash
+1. sparkContext.parallelize()
+list = [1,2,3,4,5,6,7,8,9,10,11,12]
+rdd=spark.sparkContext.parallelize(list)
+
+2. sparkContext.textFile()
+rdd_txt = spark.sparkContext.textFile("/path/to/textFile.txt")
+
+3. sparkContext.wholeTextFiles()
+rdd_whole_text = spark.sparkContext.wholeTextFiles("/path/to/textFile.txt")
+
+4. sparkContext.emptyRDD
+empty_rdd_string = spark.sparkContext.emptyRDD[String]
 ```
 
-#### Q-16
+#### Q-16 What are the profilers in PySpark ?
 ```bash
-```
+Tools that help us find why a Spark job is slow or using too much memory.
+Think of profilers as a health check tool for your Spark job.
 
-#### Q-17
+When you run a Spark job, you can open: (http://localhost:4040)
+
+It shows:
+How many jobs ran
+How long each stage took
+Which task is slow
+Memory usage
+Shuffle data size
+
+python code :- 
+import cProfile
+cProfile.run("main()")
+``` 
+
+#### Q-17 How is Apache Spark different from MapReduce ?
 ```bash
+1. Processing Model
+
+MapReduce
+Works in two strict phases: Map → Reduce
+After each phase, intermediate data is written to disk (HDFS)
+Not flexible beyond map and reduce steps
+
+Spark
+Uses a DAG (Directed Acyclic Graph) execution engine
+Supports multiple transformations (map, filter, join, groupBy, etc.)
+Keeps intermediate data in memory whenever possible
+
+Spark is more flexible and optimized.
+
+2. Performance
+MapReduce: Disk-based → Slower
+Spark: In-memory processing → Much faster (10–100x faster for iterative workloads)
+
+3. Iterative & Machine Learning Workloads
+MapReduce:
+Poor for iterative algorithms
+Each iteration reads/writes to disk
+
+Spark:
+Designed for iterative processing
+Data can stay cached in memory
+Ideal for ML and graph processing
+
+4. Streaming Support
+MapReduce:
+Batch processing only
+
+Spark:
+Supports Structured Streaming
+Can process near real-time data
+
+5. Fault Tolerance
+MapReduce:
+Uses data replication in HDFS
+
+Spark:
+Uses RDD lineage to recompute lost data
 ```
 
 #### Q-18
