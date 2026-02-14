@@ -159,43 +159,146 @@ Total executors = 5 × 4 = 20
 ```bash
 ```
 
-#### Q-6 How would you approach integrating data from an external API into your PySpark workflow ?
+#### Q-6 
 ```bash
 ```
 
 #### Q-7 Explain how you would use PySpark to join data from a Hive table and a Kafka stream ?
 ```bash
+Kafka → Spark Structured Streaming → Join with Hive table → Output
+
+Step 1: Enable Hive Support
+from pyspark.sql import SparkSession
+spark = SparkSession.builder \
+    .appName("StreamHiveJoin") \
+    .enableHiveSupport() \
+    .getOrCreate()
+
+Step 2: Read Static Hive Table
+hive_df = spark.table("analytics.user_profile")
+
+Step 3: Read Streaming Data from Kafka
+stream_df = spark.readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("subscribe", "transactions") \
+    .load()
+
+Step 4: Perform Stream–Static Join
+joined_df = parsed_stream.join(
+    hive_df,
+    on="user_id",
+    how="left"
+)
 ```
 
 #### Q-8 How would you integrate data from an external API into your PySpark pipeline ?
 ```bash
+To integrate external API data into a PySpark pipeline, I avoid calling the API on the driver. Instead, 
+I use distributed techniques like mapPartitions or foreachBatch to call the API per partition. I also handle 
+rate limits, retries, and deduplicate keys before making calls. In production, if the API data is reusable, 
+I prefer ingesting it separately into storage and performing a join within Spark for better scalability.
 ```
 
 #### Q-9 Given a requirement to process and transform data from various sources like CSV, JSON, and Parquet files, how would you handle this in a PySpark job ?
 ```bash
+High-Level Approach
+
+1. Read each source with proper configuration
+2. Enforce a consistent schema
+3. Standardize column names and types
+4. Handle nulls & bad records
+5. Apply business transformations
+6. Write to a target format (usually Parquet/warehouse)
+
+Step 1: Create Spark Session
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("MultiSourceETL") \
+    .getOrCreate()
+
+Step 2: Define a Common Schema
+from pyspark.sql.types import *
+
+common_schema = StructType([
+    StructField("id", StringType(), True),
+    StructField("name", StringType(), True),
+    StructField("amount", DoubleType(), True),
+    StructField("event_time", TimestampType(), True)
+])
+
+Step 3: Read Each Source Properly
+csv_df = spark.read \
+    .option("header", True) \
+    .schema(common_schema) \
+    .csv("input/data.csv")
 ```
 
-#### Q-10 How would you design and implement an ETL pipeline using PySpark to extract data from an RDBMS, transform it, and load it into a data warehouse ?
+#### Q-10 How would you approach integrating data from an external API into your PySpark workflow ?
 ```bash
+To integrate external API data into a PySpark workflow, I avoid making API calls on the driver. Instead, 
+I either pre-ingest API data into storage and join it within Spark, or use distributed methods like mapPartitions 
+for batch processing and foreachBatch for streaming. I also handle rate limiting, retries, and deduplicate keys 
+before calling the API to ensure scalability and fault tolerance.
 ```
 
-#### Q-11 Describe the steps you would take to implement a solution in PySpark for processing real-time sensor data to detect anomalies ?
+#### Q-11 How would you design and implement an ETL pipeline using PySpark to extract data from an RDBMS, transform it, and load it into a data warehouse ?
 ```bash
+I would extract data from the RDBMS using Spark’s JDBC connector with partitioned reads for parallelism. 
+For large tables, I would implement incremental extraction using a watermark column like updated_at. During 
+transformation, I would apply data cleaning, deduplication, type casting, and business logic validations. 
+Before loading, I would perform data quality checks. Finally, I would load the data into a warehouse using 
+staging tables and MERGE operations for upserts. The pipeline would be orchestrated using Airflow and monitored 
+with proper logging and audit tracking.
 ```
 
 #### Q-12 How would you set up a real-time data pipeline using PySpark and Kafka to process streaming data ?
 ```bash
+Producer → Kafka → PySpark Structured Streaming → Sink (DB/Data Lake)
 ```
 
 #### Q-13 When joining two large datasets causes out-of-memory errors, what strategies would you use to optimize the join operation ?
 ```bash
-Large Joins Cause OOM 
+Why Large Joins Cause OOM(OutOfMemory) :-
+
 Joins trigger shuffle
 Data is redistributed across executors
 Large partitions can overload executor memory
 Skew can make one executor hold massive data
 
+Step 1: Identify Root Cause
+Before fixing, I check: :-
 
+Spark UI → shuffle read size
+Task memory usage
+Whether one key is skewed
+Size of both datasets
+Join type (inner, left, etc.)
+Never blindly increase memory first.
+
+Strategies to Optimize Large Joins :
+
+1. Use Broadcast Join (If One Table Is Smaller)
+from pyspark.sql.functions import broadcast
+result = large_df.join(broadcast(small_df), "key")
+
+2. Handle Data Skew
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+
+3. Increase Shuffle Partitions
+spark.conf.set("spark.sql.shuffle.partitions", 400)
+
+4. Repartition Before Join
+df1 = df1.repartition("join_key")
+df2 = df2.repartition("join_key")
+
+5. Filter Early (Push Down Filtering)
+df1_filtered = df1.filter("date >= '2025-01-01'")
+
+6. Select Only Required Columns
+df1 = df1.select("id", "key", "value")
 ```
 
 #### Q-14 If your PySpark job is running slower than expected due to data skew, how would you identify and resolve the issue ?

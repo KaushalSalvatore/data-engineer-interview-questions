@@ -146,15 +146,15 @@ The Spark job itself is in the middle, and the data warehouse tables, dashboards
 are downstream.
 ```
 
-#### Q-7
+#### Q-7 what is Backpressure in streaming in kafka and how to handle backfill ? 
 ```bash
 ```
 
-#### Q-8
+#### Q-8 project has monolithic system based like Hadoop spark they want to migrate their system to any cloud  so what will be strategy for minimal down time explain in steps of planning ?
 ```bash
 ```
 
-#### Q-9
+#### Q-9 if in project we using hive and want to convert in redshift so how to handle schema conversation problem. because schema semantic is different (hint schema conversation tool SCT in AWS) ? 
 ```bash
 ```
 

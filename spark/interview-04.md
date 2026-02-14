@@ -1,5 +1,15 @@
-#### Q-1
+#### Q-1 Unity Catalog in Databricks ?
 ```bash
+Unity Catalog is the central governance layer inside Databricks.
+
+It manages:
+🔐 Data access control
+📊 Metadata (tables, schemas, catalogs)
+🧬 Data lineage
+📜 Audit logs
+🌍 Cross-workspace sharing
+
+The security + control center for all your data in Databricks.
 ```
 
 #### Q-2

@@ -388,14 +388,70 @@ Spark:
 Uses RDD lineage to recompute lost data
 ```
 
-#### Q-18
+#### Q-18 What is Broadcast ? 
 ```bash
+Broadcast join is used when one dataset is small enough to fit in memory, allowing Spark to distribute it to all 
+executors and avoid expensive shuffles.
+
+Problem :-
+When joining two tables:
+Large table → 1 billion rows
+Small table → 10k rows
+
+Normally Spark:
+Shuffles both tables across cluster
+Expensive
+Slow
+
+What Broadcast Does
+Broadcast sends the small table to every executor.
+So:
+No shuffle of large table
+Faster join
+Less network cost
+
+from pyspark.sql.functions import broadcast
+
+large_df = spark.read.parquet("transactions")
+small_df = spark.read.parquet("countries")
+
+result = large_df.join(
+    broadcast(small_df),
+    "country_id",
+    "left"
+)
 ```
 
-#### Q-19
+#### Q-19 collect_list() and collect_set() ? 
 ```bash
+These are aggregation functions used with groupBy().
+
+1. collect_list()
+Collects values into a list
+Keeps duplicates
+Order not guaranteed
+
+from pyspark.sql.functions import collect_list
+df.groupBy("user_id") \
+  .agg(collect_list("product_id").alias("products"))
+
+2. collect_set()
+Collects unique values
+Removes duplicates
+
+from pyspark.sql.functions import collect_set
+df.groupBy("user_id") \
+  .agg(collect_set("product_id").alias("unique_products"))
 ```
 
-#### Q-20
+#### Q-20 managed vs external table ? 
 ```bash
+A Managed Table (also called Internal Table) means:
+The system manages both metadata AND data files.
+
+👉 Metadata deleted
+👉 Data files also deleted
+
+An External Table means:
+The system manages only metadata, NOT the actual data files.
 ```
