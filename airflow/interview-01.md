@@ -123,6 +123,39 @@ Example:
 S3Hook → Connects to S3
 S3Operator → Performs action on S3
 S3KeySensor → Waits for file in S3
+
+1. BashOperator : Runs a bash / shell command.
+
+from airflow.operators.bash import BashOperator
+
+task = BashOperator(
+    task_id="run_shell",
+    bash_command="echo Hello Airflow"
+)
+Run shell scripts,Trigger Spark jobs,Execute CLI tools,Move files,Run ETL scripts,
+
+2. PythonOperator
+Executes a Python function.
+
+from airflow.operators.python import PythonOperator
+
+def my_function():
+    print("Hello from Python")
+task = PythonOperator(
+    task_id="run_python",
+    python_callable=my_function
+)
+
+3. EmailOperator
+Sends an email.
+
+from airflow.operators.email import EmailOperator
+email_task = EmailOperator(
+    task_id="send_email",
+    to="team@example.com",
+    subject="Airflow Alert",
+    html_content="<h3>Task Completed</h3>"
+)
 ```
 
 #### Q-6 What is a Task Instance in Airflow ?
