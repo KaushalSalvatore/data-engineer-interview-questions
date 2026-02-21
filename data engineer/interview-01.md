@@ -148,14 +148,53 @@ are downstream.
 
 #### Q-7 what is Backpressure in streaming in kafka and how to handle backfill ? 
 ```bash
+Backpressure happens when: Producers send data faster than consumers can process it
+Producer → 10,000 msgs/sec
+Consumer → 2,000 msgs/sec
+➡️ Remaining 8,000 msgs/sec accumulate → lag = backpressure
+
+1. Scale Consumers (Horizontal Scaling)
+Increase number of consumers in a consumer group
+Kafka will rebalance partitions
+Rule: consumers ≤ partitions
+
+2. Increase Partitions
+More partitions = more parallelism
+
+3. Optimize Consumer Processing
+Batch processing instead of one-by-one
+Tune configs:
+
+Backfill in Kafka : 
+Backfill = Processing historical data (old data) again.
+
+When it happens:
+New consumer added
+Bug fix requires reprocessing
+Data warehouse rebuild
+Late-arriving data
+
+How to Handle Backfill Safely
+1. Reset Offsets
+kafka-consumer-groups --reset-offsets
 ```
 
-#### Q-8 project has monolithic system based like Hadoop spark they want to migrate their system to any cloud  so what will be strategy for minimal down time explain in steps of planning ?
+#### Q-8
 ```bash
+
 ```
 
 #### Q-9 if in project we using hive and want to convert in redshift so how to handle schema conversation problem. because schema semantic is different (hint schema conversation tool SCT in AWS) ? 
 ```bash
+We used AWS SCT to convert Hive schema to Redshift. SCT handled most DDL conversion, but we manually fixed data types, 
+flattened complex structures like arrays/maps, and redesigned partitioning using sort/dist keys. Data was migrated via 
+S3 using COPY command, followed by validation and query optimization.
+
+Pro Tips
+Use Parquet for faster migration
+Avoid small files problem
+Pre-clean data before migration
+Automate validation scripts
 ```
 
 #### Q-10
