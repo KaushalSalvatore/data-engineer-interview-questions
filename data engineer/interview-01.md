@@ -179,9 +179,35 @@ How to Handle Backfill Safely
 kafka-consumer-groups --reset-offsets
 ```
 
-#### Q-8
+#### Q-8 How would you handle schema evolution in a data lake (e.g., a new column gets added in incoming JSON files) ?
 ```bash
+You have JSON data landing in a data lake (e.g., Amazon S3):
+Old :-
+{
+  "user_id": "123",
+  "amount": 100
+}
+New :-
+{
+  "user_id": "123",
+  "amount": 100,
+  "currency": "INR"
+}
 
+1. Schema-on-Read (Recommended for Data Lakes)
+SELECT 
+  user_id,
+  amount,
+  COALESCE(currency, 'INR') AS currency
+FROM transactions;
+
+2. Schema Versioning in Data
+{
+  "schema_version": 2,
+  "user_id": "123",
+  "amount": 100,
+  "currency": "INR"
+}
 ```
 
 #### Q-9 if in project we using hive and want to convert in redshift so how to handle schema conversation problem. because schema semantic is different (hint schema conversation tool SCT in AWS) ? 
@@ -197,7 +223,7 @@ Pre-clean data before migration
 Automate validation scripts
 ```
 
-#### Q-10
+#### Q-10 
 ```bash
 ```
 

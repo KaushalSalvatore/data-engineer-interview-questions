@@ -12,11 +12,11 @@ It manages:
 The security + control center for all your data in Databricks.
 ```
 
-#### Q-2
+#### Q-2 How do you optimize Spark jobs to run faster when dealing with terabytes of data ?
 ```bash
 ```
 
-#### Q-3
+#### Q-3 Explain Slowly Changing Dimensions (SCD Type 2). How would you implement it in Spark ?
 ```bash
 ```
 
