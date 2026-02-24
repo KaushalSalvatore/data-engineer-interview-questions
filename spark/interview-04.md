@@ -20,8 +20,31 @@ The security + control center for all your data in Databricks.
 ```bash
 ```
 
-#### Q-4
+#### Q-4 Explain optimization techniques in Spark ?
 ```bash
+1. Use Efficient File Formats
+Parquet
+ORC
+
+2. Partitioning & Data Layout Optimization
+
+3. Reduce Shuffle (Most Important 🔥)
+Shuffle = disk + network + memory.
+Techniques:Filter before join,Avoid unnecessary groupBy,Avoid distinct unless required
+Use map-side operations
+
+4. Join Optimization
+-> Broadcast Join
+from pyspark.sql.functions import broadcast
+df_large.join(broadcast(df_small), "id")
+-> Handle Data Skew (Key salting)
+-> Tune Spark Configurations
+spark.sql.shuffle.partitions
+executor memory
+executor cores
+driver memory
+
+5. Caching & Persistence
 ```
 
 #### Q-5

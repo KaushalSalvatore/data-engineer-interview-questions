@@ -113,31 +113,146 @@ Use Kubernetes or cloud autoscaling
 E. Partitioning Strategy
 ```
 
-#### Q-5  Tell me about a time you handled a production issue under pressure. How did you manage it ?
+#### Q-5 Tell me about a time you handled a production issue under pressure. How did you manage it ?
 ```bash
+We had a production ETL pipeline built on Databricks processing raw JSON files from Amazon S3 into curated 
+Delta tables.
+
+During month-end reporting, dashboards suddenly showed missing data for several hours, and finance escalated 
+immediately.
+
+I was responsible for:
+Identifying why the pipeline failed
+Restoring data quickly
+Ensuring no corruption in Delta tables
+Meeting reporting deadlines
+
+1. Immediate Triage
+-> Checked Databricks job runs → found failures in the Silver layer
+-> Error: Schema mismatch due to new column added in raw JSON
+-> The job failed because schema evolution was not enabled
+
+2. Backfill & Recovery
+-> Reprocessed failed raw files
+-> Validated row counts between Bronze → Silver → Gold
+-> Used Delta time travel to confirm no corrupted writes
+
+Example :- AWS + Snowflake + Kafka (Real-Time Incident)
+Situation: 
+We had a real-time transaction pipeline:
+Events streamed via Apache Kafka
+Running on Amazon Web Services
+Loaded into Snowflake for analytics
+
+During a high-traffic campaign, alerts triggered:
+Kafka consumer lag spiking
+Snowflake ingestion latency > 10 minutes
+Fraud dashboard delayed
+
+Task 
+Restore real-time ingestion while ensuring:
+No duplicate transactions
+No data loss
+Fraud systems remain accurate
+
+1️⃣ Rapid Diagnosis
+Checked Kafka metrics → consumers falling behind
+Identified Snowflake warehouse was overloaded
+COPY INTO operations were queuing
+
+2️⃣ Immediate Mitigation
+Scaled Snowflake warehouse up (larger compute cluster)
+Increased Kafka consumer parallelism
+Prioritized fraud topic over analytics topic
+
+3️⃣ Integrity Controls
+Verified Kafka offsets were not committed prematurely
+Confirmed idempotent writes in Snowflake (dedupe on transaction_id)
+Monitored DLQ for failed records
+
+4️⃣ Long-Term Fix
+Introduced micro-batching instead of per-event loads
+Enabled auto-scaling for Snowflake warehouse
+Added alert for warehouse queue depth
 ```
 
 #### Q-6 How do you explain technical solutions to non-technical clients ?
 ```bash
+Focus on what problem we’re solving, not how
+
+Example:
+“Instead of saying we built a pipeline using Apache Kafka, I start with:
+‘We built a system that processes your transactions instantly so you can detect fraud in real time.’”
+
+Data pipeline → “assembly line”
+Streaming → “live traffic updates”
+Batch → “end-of-day report”
+
+We implemented a real-time pipeline using Databricks for transaction processing.
+Right now, your reports are delayed by hours. We’re building a system that updates them almost instantly—so you 
+can detect issues like fraud or sales spikes as they happen.
 ```
 
-#### Q-7  Imagine a client has unrealistic expectations on delivery timelines how would you handle it ?
+#### Q-7 Explain the bronze-silver-gold architecture in a data lakehouse. Why is this layering important ?
+```bash
+Raw Data → Cleaned Data → Business-Ready Data
+(Bronze)    (Silver)        (Gold)
+
+Bronze Layer — Raw Data
+Purpose:
+Store raw, unmodified data exactly as it arrives.
+Characteristics:
+JSON / CSV / streaming data
+No transformations
+Append-only
+May contain duplicates, nulls, bad records
+
+Silver Layer — Cleaned & Structured
+
+Purpose:
+Transform Bronze into validated, structured datasets.
+Typical Operations:
+Remove duplicates
+Fix data types
+Handle nulls
+Enforce schema
+Basic joins (e.g., add user info)
+
+Example:
+Cast amount to decimal
+Standardize timestamps
+Drop corrupt records
+
+Now data is:
+Queryable
+Consistent
+Trusted
+👉 Silver = Operational data layer
+
+Gold Layer — Business-Ready Data
+
+Purpose:
+Optimized for analytics and reporting.
+Typical Operations:
+Aggregations (daily revenue, user metrics)
+KPIs
+Denormalized tables
+BI-ready datasets
+```
+
+#### Q-8 
 ```bash
 ```
 
-#### Q-8 Describe a situation where you worked with multiple teams having conflicting priorities. How did you manage deadlines ?
+#### Q-9 
 ```bash
 ```
 
-#### Q-9 Suppose your pipeline needs to run across AWS and Azure together (multi-cloud). How would you design secure and cost-effective data access ?
+#### Q-10 
 ```bash
 ```
 
-#### Q-10 Explain the bronze-silver-gold architecture in a data lakehouse. Why is this layering important ?
-```bash
-```
-
-#### Q-11 If you are asked to ingest PDF and image files into your pipeline and make them queryable, how would you design it?
+#### Q-11
 ```bash
 ```
 
