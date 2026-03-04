@@ -84,16 +84,43 @@ ShuffleHashJoin
 6. Cache If Intermediate Used Multiple Times
 ```
 
-#### Q-4
+#### Q-4 Describe a situation where a pipeline failed in production. How did you troubleshoot it ?
 ```bash
+In one project, a scheduled ETL pipeline failed due to a Spark OutOfMemory error. I checked the orchestration 
+logs to identify the failing stage, then analyzed the Spark UI and found severe data skew during a join. A new 
+data source had introduced highly imbalanced keys. I applied a temporary fix by increasing executor memory and 
+shuffle partitions to restore service quickly. Then I implemented a permanent solution using adaptive query 
+execution and repartitioning to handle skew. I also added monitoring to prevent recurrence.
 ```
 
-#### Q-5
+#### Q-5 How do you implement incremental data loads in your pipelines?
 ```bash
+Incremental Load : - We process only new or changed records since the last successful run.
+
+1. Timestamp-Based Incremental Load
+If source table has:
+created_at
+updated_at
+last_modified_ts
 ```
 
-#### Q-6
+#### Q-6 Explain CDC and how you have implemented it ? 
 ```bash
+Change Data Capture (CDC) is a technique to capture only incremental changes (INSERT, UPDATE, DELETE) 
+from a source system instead of reloading full data every time.
+Instead of: Loading 100M rows daily
+We:Load only changed rows
+
+from delta.tables import DeltaTable
+deltaTable = DeltaTable.forPath(spark, "/mnt/delta/orders")
+(deltaTable.alias("target")
+ .merge(
+     sourceDF.alias("source"),
+     "target.id = source.id"
+ )
+ .whenMatchedUpdateAll()
+ .whenNotMatchedInsertAll()
+ .execute())
 ```
 
 #### Q-7
