@@ -77,4 +77,37 @@
 
 #### Q-20 What are AWS Glue Crawlers and what do they do ?
 ```bash
+Raw Data → Crawler → Schema → Data Catalog Table
+An AWS Glue Crawler:
+Connects to a data source
+Reads the data structure
+Infers the schema
+Creates or updates tables in the AWS Glue Data Catalog
+
+What Can It Crawl ?
+It can scan:
+Amazon S3 (most common)
+Amazon RDS
+Amazon Redshift
+JDBC data sources
+
+Why Glue Crawlers Are Useful
+1️⃣ Automatic Schema Discovery
+2️⃣ Schema Evolution
+3️⃣ Keeps Data Catalog Updated
+
+How It Works (Step-by-Step)
+Create Crawler
+Choose data source (e.g., S3 path)
+Assign IAM role
+Choose database in Data Catalog
+Run crawler
+
+Crawlers do NOT move or transform data
+They only create metadata.
+Actual transformations happen in:
+Glue Jobs
+Spark jobs
+EMR
+Lambda
 ```

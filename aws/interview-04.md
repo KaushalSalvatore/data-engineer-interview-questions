@@ -1,9 +1,74 @@
-#### Q-1 What is the AWS Glue Data Catalog?
+#### Q-1 What is the AWS Glue Data Catalog ?
 ```bash
+The AWS Glue Data Catalog is a centralized metadata repository that stores:
+Table definitions
+Database schemas
+Column names & data types
+Partition information
+Data location (like S3 path)
+
+It does NOT store the actual data — only metadata about the data.
+Actual Data → Stored in S3
+Schema Info → Stored in Data Catalog
+
+Example table metadata:
+
+Database: sales_db
+Table: orders
+Columns:
+  order_id (string)
+  amount (double)
+  region (string)
+Partitions:
+  year
+  month
+Location:
+  s3://sales-data/
+
+S3 (Raw Data)
+     ↓
+Glue Crawler
+     ↓
+Glue Data Catalog
+     ↓
+Athena / Redshift / EMR
 ```
 
 #### Q-2 Explain the types of triggers in AWS Glue ? 
 ```bash
+Condition Met → Trigger Fires → Job/Crawler Runs
+There are three main types of triggers.
+
+There are three main types of triggers.
+1️⃣ Scheduled Trigger
+Uses:
+Cron expressions
+Fixed intervals
+
+Example:
+Run ETL every night at 1 AM
+Run crawler every 30 minutes
+
+Daily ETL → 1:00 AM → Transform S3 raw data → Store cleaned data
+
+2️⃣ On-Demand Trigger
+You start it via:
+AWS Console
+AWS CLI
+SDK/API
+
+Best for:
+✔ Testing
+✔ Debugging
+✔ Manual reprocessing
+
+3️⃣ Conditional Trigger (Most Powerful)
+
+Job succeeds
+Job fails
+Multiple jobs complete
+
+Job A → Job B → Job C
 ```
 
 #### Q-3 What is a Job Bookmark in AWS Glue ?
