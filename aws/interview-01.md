@@ -162,50 +162,92 @@ Updates table metadata
 No manual schema editing required
 ```
 
-#### Q-9
+#### Q-9 What is AWS Glue Spark Runtime, and how does it utilize Apache Spark for distributed data processing ?
+```bash
+AWS Glue Spark Runtime is the managed Apache Spark execution environment used by Glue to run ETL jobs. It provisions 
+Spark drivers and executors automatically using DPUs, enabling distributed and parallel data processing without 
+requiring cluster management. It leverages Spark’s partitioning, fault tolerance, and in-memory processing capabilities 
+while integrating tightly with AWS services like S3 and IAM.
+
+AWS Glue Spark Runtime is the managed Apache Spark environment that runs your Glue ETL jobs.
+
+When you create a Glue job, AWS automatically spins up a managed Apache Spark cluster behind the scenes to 
+execute your code.
+
+What Happens When You Run a Glue Job: 
+1. Glue provisions compute resources (DPUs)
+2. A Spark driver is launched
+3. Executors are created
+4. Data is processed in parallel
+5. Results written to S3 / Redshift / etc.
+
+DPU = Data Processing Unit
+1 DPU roughly includes:
+4 vCPUs
+16 GB memory
+More DPUs → more Spark executors → more parallelism.
+You configure how many DPUs your job uses.
+```
+
+#### Q-10 Explain the difference between Amazon RDS and Amazon Redshift ? 
+```bash
+| Feature      | Amazon RDS                    | Amazon Redshift             |
+| ------------ | ----------------------------- | --------------------------- |
+| Purpose      | Transactional database (OLTP) | Analytical warehouse (OLAP) |
+| Workload     | Day-to-day app operations     | Reporting & analytics       |
+| Data Volume  | GB–TB                         | TB–PB                       |
+| Storage Type | Row-based                     | Columnar                    |
+| Query Type   | Fast single-row queries       | Complex aggregations        |
+
+Application → RDS (transactions)
+            ↓
+        ETL Pipeline
+            ↓
+        Redshift (analytics)
+            ↓
+        BI Dashboard
+```
+
+#### Q-11 What is IAM, and why is it important ?
+```bash
+AWS Identity and Access Management (IAM) is a service that helps you securely control access to AWS services and 
+resources. IAM allows you to manage users, groups, and roles with fine-grained permissions. It’s important because 
+it helps enforce the principle of least privilege, ensuring users only have access to the resources they need, thereby 
+enhancing security and compliance.
+```
+
+#### Q-12 What is Amazon CloudWatch, and what are its main components ?
 ```bash
 ```
 
-#### Q-10
+#### Q-13 What is AWS Lambda, and how does it enable serverless computing ?
 ```bash
 ```
 
-#### Q-11
+#### Q-14 What is Elastic Load Balancing (ELB) in AWS ?
 ```bash
 ```
 
-#### Q-12
+#### Q-15 Explain how you would choose between Amazon RDS, Amazon DynamoDB, and Amazon Redshift for a data-driven application ? 
 ```bash
 ```
 
-#### Q-13
+#### Q-16 What are the main components of Amazon Redshift ?
 ```bash
 ```
 
-#### Q-14
+#### Q-17 What types of data sources can you load into Amazon Redshift ?
 ```bash
 ```
 
-#### Q-15
+#### Q-18 How does Amazon Redshift handle data compression and distribution ?
 ```bash
 ```
 
-#### Q-16
+#### Q-19  What are some best practices for optimizing query performance in Amazon Redshift ?
 ```bash
 ```
 
-#### Q-17
-```bash
-```
-
-#### Q-18
-```bash
-```
-
-#### Q-19
-```bash
-```
-
-#### Q-20
+#### Q-20 How does Amazon Redshift handle concurrency and scalability ?
 ```bash
 ```
