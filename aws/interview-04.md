@@ -286,32 +286,163 @@ Update existing rows
 
 #### Q-13 What is AWS Glue Workflows ?
 ```bash
+A Glue Workflow is:A collection of Glue jobs, crawlers, and triggers organized into a coordinated ETL 
+pipeline.
+
+Crawler → Job A → Job B → Job C
+
+A Glue Workflow typically includes:
+1️⃣ Jobs (ETL transformations)
+2️⃣ Crawlers (schema discovery)
+3️⃣ Triggers (control execution flow)
+
+Step 1: Crawler
+        ↓
+Step 2: Clean Job
+        ↓
+Step 3: Aggregate Job
+        ↓
+Step 4: Load to Warehouse
 ```
 
 #### Q-14 How does AWS Glue integrate with AWS Step Functions ?
 ```bash
+Why Integrate Glue with Step Functions?
+✔ Orchestrate multiple AWS services
+✔ Add complex branching logic
+✔ Add retries, timeouts, parallelism
+✔ Handle failure scenarios gracefully
+
+So instead of:
+Crawler → Glue Job → Done
+
+You can build:
+API Call → Lambda → Glue Job → Validation → SNS → Archive
 ```
 
 #### Q-15 What is the difference between Glue DynamicFrames and Spark DataFrames ?
 ```bash
+| DynamicFrame                        | Spark DataFrame           |
+| ----------------------------------- | ------------------------- |
+| Glue-specific abstraction           | Native Spark abstraction  |
+| Schema flexible                     | Schema strict             |
+| Built for messy data                | Built for structured data |
+| Handles semi-structured data easily | Needs predefined schema   |
 ```
 
 #### Q-16 What are AWS Glue Blueprints ?
 ```bash
+In AWS Glue, Blueprints are:
+Predefined, reusable templates that automatically generate ETL workflows.
+Instead of manually creating:
+Crawlers
+Jobs
+Triggers
+Workflows
+
+A Blueprint creates them for you based on your inputs.
+Think of it like:
+“Give me source + target → I’ll build the pipeline structure.”
+
+Why Use Blueprints?
+
+✔ Faster pipeline setup
+✔ Standardization across teams
+✔ Reduced manual configuration
+✔ Reusable ETL patterns
+✔ Enforces best practices
 ```
 
 #### Q-17 How does Glue handle schema conflicts ?
 ```bash
+In AWS Glue, schema conflicts usually happen when:
+Same column has different data types
+Columns are missing in some files
+Nested JSON fields vary
+Partition schemas differ
+
+1️⃣ DynamicFrames = Built for Schema Drift
+✔ Allow missing columns
+✔ Allow extra columns
+✔ Handle inconsistent types
+
+
+2️⃣ ResolveChoice (Key Feature)
+3️⃣ Crawlers & Schema Evolution
+When using Glue Crawlers:
+New columns → automatically added
+Removed columns → not automatically deleted
+Type changes → may create conflicts
+
+4️⃣ Partition Schema Conflicts
+Partition A → price: int
+Partition B → price: double
+
+Glue may:
+Promote to common type (e.g., double)
+Or create a conflict
 ```
 
 #### Q-18 What is AWS Glue Flex ?
 ```bash
+Instead of running your job immediately at full dedicated capacity, Glue Flex:
+Uses spare AWS compute capacity at a lower cost, but with variable start time.
+So you trade speed for cost savings.
+
+Why Does It Exist?
+Normally, Glue jobs run in:
+Standard execution mode
+Starts quickly
+Dedicated resources
+Higher cost
+
+Glue Flex:
+Uses available spare capacity
+May delay job start
+Up to ~30–35% cheaper (varies by region)
+Great for non-urgent workloads.
 ```
 
 #### Q-19  What are AWS Glue Tags ?
 ```bash
+In AWS Glue, tags are:
+Key–value metadata labels attached to Glue resources.
+They help you organize, control, and track your Glue resources.
+
+You can tag:
+Glue Jobs
+Crawlers
+Workflows
+Connections
+Development endpoints
+
+Key: Environment   Value: Production
+Key: Team          Value: DataEngineering
+Key: CostCenter    Value: Finance
 ```
 
 #### Q-20 How do Glue Streaming Jobs process late-arriving data ?
 ```bash
+Late data = records that arrive after their event time window has passed.
+Event time: 10:00 AM
+Arrival time: 10:07 AM
+Window: 5 minutes
+
+This happens due to:
+Network delays
+Device buffering
+Retries
+Distributed systems lag
+
+How Glue Streaming Handles It
+1️⃣ Event-Time Processing
+.withWatermark("event_time", "10 minutes")
+
+2️⃣ Watermarking (The Key Concept)
+df.withWatermark("event_time", "10 minutes") \
+  .groupBy(window("event_time", "5 minutes")) \
+  .count()
+
+3️⃣ Windowed Aggregations
+10:00–10:05 window
 ```
