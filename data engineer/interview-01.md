@@ -223,31 +223,80 @@ Pre-clean data before migration
 Automate validation scripts
 ```
 
-#### Q-10 
+#### Q-10 What is the best way to schedule daily pipeline with failure retry and notification alerts ?
 ```bash
+Scheduler (Airflow)
+      ↓
+Trigger DAG (Daily)
+      ↓
+Task 1: Extract Data
+      ↓
+Task 2: Transform Data
+      ↓
+Task 3: Load Data
+      ↓
+Success / Failure Notification
+
+The best way to schedule a daily pipeline with retries and alerts is to use an orchestration tool like Apache Airflow. 
+I would create a DAG scheduled daily, configure task retries using retry and retry_delay, and enable failure 
+notifications through email or Slack. Airflow manages task dependencies, monitoring, logging, and automatic 
+retries, making it ideal for reliable production pipelines.
 ```
 
-#### Q-11
+#### Q-11 How will you design a parameterized pipeline for dynamic data ingestion from multiple files ?  
 ```bash
+Source Systems
+ (CSV / JSON / Parquet / APIs)
+        │
+        ▼
+Landing Zone (S3 / Data Lake)
+        │
+        ▼
+Metadata Table (Config Driven)
+        │
+        ▼
+Orchestration Layer (Airflow)
+        │
+        ▼
+Dynamic Ingestion Engine (Spark)
+        │
+        ▼
+Data Quality Checks
+        │
+        ▼
+Target Storage
+(Snowflake / Data Warehouse)
 ```
 
-#### Q-12
+#### Q-12 What is the best way to handle null values during data transformation ? 
 ```bash
+1. Replace Null Values with Default Values
+SELECT COALESCE(salary,0) AS salary
+FROM employees;
+
+2. Remove Rows with Null Values
+3. Apply Conditional Logic
+4. Use Statistical Imputation (Mean Median Mode)
 ```
 
-#### Q-13
+#### Q-13 Your job is failing due to OOM (Out of Memory) on the last shuffle step — how will you debug and optimize this issue ?
 ```bash
+If a Spark job fails with an OOM error during the shuffle stage, I first check the Spark UI to identify the 
+failing stage and memory usage. Then I optimize by increasing shuffle partitions, repartitioning data based on 
+join keys, and reducing data size before the shuffle. I also check for data skew and apply techniques like salting 
+if needed. If one dataset is small, I use broadcast joins to avoid shuffling. Finally, I tune executor memory 
+and cluster resources if required.
 ```
 
 #### Q-14
 ```bash
 ```
 
-#### Q-15
+#### Q-15 
 ```bash
 ```
 
-#### Q-16
+#### Q-16 
 ```bash
 ```
 

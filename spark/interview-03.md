@@ -147,20 +147,159 @@ Executor cores = 3–4
 Total executors = 5 × 4 = 20
 ```
 
-#### Q-3
+#### Q-3 - You need to join two large datasets, but the join operation is causing out-of-memory errors. What strategies would you use to optimize this join ?
 ```bash
+1. Use Broadcast Join (If One Table Is Small)
+from pyspark.sql.functions import broadcast
+result = large_df.join(broadcast(small_df), "id", "inner")
+
+2. Repartition Before Join
+df1 = df1.repartition(200, "id")
+df2 = df2.repartition(200, "id")
+result = df1.join(df2, "id")
+
+3. Filter Data Before Joining
+filtered_df1 = df1.filter("status = 'ACTIVE'")
+filtered_df2 = df2.select("id", "name")
+
+result = filtered_df1.join(filtered_df2, "id")
+
+4. Handle Data Skewc(Salting technique)
+
+5. Use Bucketing
+df.write.bucketBy(100, "id").saveAsTable("table_bucketed")
 ```
 
-#### Q-4
+#### Q-4 Write PySpark code to remove duplicates based on multiple columns ? 
 ```bash
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("RemoveDuplicates").getOrCreate()
+
+data = [
+    (1, "Alice", "alice@gmail.com"),
+    (2, "Bob", "bob@gmail.com"),
+    (3, "Alice", "alice@gmail.com"),
+    (4, "Charlie", "charlie@gmail.com")
+]
+
+columns = ["id", "name", "email"]
+
+df = spark.createDataFrame(data, columns)
+
+# Remove duplicates based on name and email
+df_clean = df.dropDuplicates(["name", "email"])
+
+df_clean.show()
+
+-----------------------------------------------------------------------------------
+from pyspark.sql.window import Window
+from pyspark.sql.functions import row_number, col
+
+window_spec = Window.partitionBy("name", "email").orderBy(col("id").desc())
+
+df_clean = df.withColumn("rn", row_number().over(window_spec)) \
+             .filter(col("rn") == 1) \
+             .drop("rn")
 ```
 
-#### Q-5
+#### Q-5 Write Pyspark code to implement SCD logic ?
 ```bash
+-> SCD Type 1 (Overwrite Old Data)
+
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("SCD_Type1").getOrCreate()
+
+# Existing dimension table
+dim_data = [
+    (1, "Alice", "Delhi"),
+    (2, "Bob", "Mumbai")
+]
+
+dim_df = spark.createDataFrame(dim_data, ["id","name","city"])
+
+# Incoming source data
+src_data = [
+    (1, "Alice", "Pune"),
+    (3, "Charlie", "Bangalore")
+]
+
+src_df = spark.createDataFrame(src_data, ["id","name","city"])
+
+# Overwrite changes
+final_df = src_df.unionByName(dim_df).dropDuplicates(["id"])
+
+final_df.show()
+-----------------------------------------------------------------
+-> SCD Type 2 (Maintain History)
+
+from pyspark.sql.functions import col, lit, current_date
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("SCD_Type2").getOrCreate()
+
+# Existing dimension table
+dim_data = [
+    (1, "Alice", "Delhi", "2024-01-01", None, "Y"),
+    (2, "Bob", "Mumbai", "2024-01-01", None, "Y")
+]
+
+dim_cols = ["id","name","city","start_date","end_date","current_flag"]
+dim_df = spark.createDataFrame(dim_data, dim_cols)
+
+# Source data
+src_data = [
+    (1, "Alice", "Pune"),
+    (2, "Bob", "Mumbai"),
+    (3, "Charlie", "Bangalore")
+]
+
+src_df = spark.createDataFrame(src_data, ["id","name","city"])
+
+# Join source with dimension
+joined_df = src_df.join(dim_df, "id", "left")
+
+# Detect changed records
+changed_df = joined_df.filter(col("city") != col("dim_df.city"))
+
+# Expire old records
+expired_df = dim_df.join(changed_df, "id") \
+    .withColumn("end_date", current_date()) \
+    .withColumn("current_flag", lit("N"))
+
+# Insert new records
+new_records = src_df.withColumn("start_date", current_date()) \
+    .withColumn("end_date", lit(None)) \
+    .withColumn("current_flag", lit("Y"))
+
+# Final dimension table
+final_dim = expired_df.unionByName(new_records)
+
+final_dim.show()
 ```
 
-#### Q-6 
+#### Q-6 Write a PySpark code to read CSV file from S3 Bucket and convert it into Parquet format ? 
 ```bash
+1️⃣ Basic PySpark Code
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("CSV_to_Parquet") \
+    .getOrCreate()
+
+# Read CSV file from S3
+df = spark.read \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .csv("s3a://my-bucket/input/data.csv")
+
+# Write as Parquet
+df.write \
+    .mode("overwrite") \
+    .parquet("s3a://my-bucket/output/data_parquet")
+
+2️⃣ With AWS Credentials (If Required)
 ```
 
 #### Q-7 Explain how you would use PySpark to join data from a Hive table and a Kafka stream ?

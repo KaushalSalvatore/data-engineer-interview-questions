@@ -240,19 +240,19 @@ Denormalized tables
 BI-ready datasets
 ```
 
-#### Q-8 
+#### Q-8 How would you optimize Glue job for large files processing ?
 ```bash
 ```
 
-#### Q-9 
+#### Q-9 How can you trigger Glue job automatically on S3 file arrival ? 
 ```bash
 ```
 
-#### Q-10 
+#### Q-10  How will you read data from S3 bucket and write into another bucket using Glue Job ? 
 ```bash
 ```
 
-#### Q-11
+#### Q-11 What is AWS Glue? How is it different from Databricks ? 
 ```bash
 ```
 
