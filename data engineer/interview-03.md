@@ -242,18 +242,100 @@ BI-ready datasets
 
 #### Q-8 How would you optimize Glue job for large files processing ?
 ```bash
+1️⃣ Increase Parallelism (Repartition Data)
+df = df.repartition(100)
+2️⃣ Use Columnar Formats Instead of CSV/JSON
+df.write.parquet("s3://data-bucket/output/")
+3️⃣ Push Down Predicate Filtering
+4️⃣ Enable Job Bookmarking
+5️⃣ Enable Glue Auto Scaling
+6️⃣ Use DynamicFrames to DataFrames Conversion
+7️⃣ Use Broadcast Join for Small Tables
 ```
 
 #### Q-9 How can you trigger Glue job automatically on S3 file arrival ? 
 ```bash
+S3 Upload
+   ↓
+S3 Event Notification
+   ↓
+AWS Lambda Trigger
+   ↓
+Start AWS Glue Job
+   ↓
+ETL Processing
+
+-> Create Lambda Function
+
+import boto3
+
+def lambda_handler(event, context):
+    
+    glue = boto3.client('glue')
+    
+    response = glue.start_job_run(
+        JobName='my_glue_job'
+    )
+    
+    return response
+
+-> Pass S3 File Path to Glue Job
+import boto3
+
+def lambda_handler(event, context):
+
+    s3_path = event['Records'][0]['s3']['object']['key']
+    
+    glue = boto3.client('glue')
+
+    glue.start_job_run(
+        JobName='my_glue_job',
+        Arguments={
+            '--input_file': s3_path
+        }
+    )
 ```
 
 #### Q-10  How will you read data from S3 bucket and write into another bucket using Glue Job ? 
 ```bash
+1️⃣ Initialize Glue Job
+import sys
+from awsglue.context import GlueContext
+from pyspark.context import SparkContext
+from awsglue.job import Job
+
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+
+job = Job(glueContext)
+job.init("s3_to_s3_job", {})
+
+2️⃣ Read Data from Source S3 Bucket
+source_data = glueContext.create_dynamic_frame.from_options(
+    connection_type="s3",
+    connection_options={"paths": ["s3://source-bucket/input/"]},
+    format="csv",
+    format_options={"withHeader": True}
+)
 ```
 
 #### Q-11 What is AWS Glue? How is it different from Databricks ? 
 ```bash
+AWS Glue is a serverless ETL service from AWS used to prepare and transform data for analytics.
+
+The main difference between AWS Glue and Databricks:
+
+AWS Glue → Serverless ETL service mainly for data integration
+
+Databricks → Unified data analytics platform built on Spark with advanced features like ML, notebooks, 
+and optimized performance
+
+Use Databricks when:
+You need big data processing
+Machine learning pipelines
+Real-time streaming
+Advanced Spark optimization
 ```
 
 #### Q-12 
@@ -264,30 +346,30 @@ BI-ready datasets
 ```bash
 ```
 
-#### Q-14
+#### Q-14 How do you implement audit logging for a data pipeline using SQL procedures and triggers?
 ```bash
 ```
 
-#### Q-15
+#### Q-15  You have a huge text file, how would you replicate a given row "n" number of times, write a code for this ?
 ```bash
 ```
 
-#### Q-16
+#### Q-16 How is deployment done in your project ? Explain about development/testing etc. ?
 ```bash
 ```
 
-#### Q-17
+#### Q-17  Explain dimensional modeling and how you would design a sales fact table with product and customer dimensions ?
 ```bash
 ```
 
-#### Q-18
+#### Q-18 How would you design a fact table for an e-commerce platform ?
 ```bash
 ```
 
-#### Q-19
+#### Q-19 How would you design a data warehouse for a retail business using Synapse ?
 ```bash
 ```
 
-#### Q-20
+#### Q-20 How would you handle late-arriving data in a batch ETL pipeline ?
 ```bash
 ```

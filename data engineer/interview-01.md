@@ -288,27 +288,27 @@ if needed. If one dataset is small, I use broadcast joins to avoid shuffling. Fi
 and cluster resources if required.
 ```
 
-#### Q-14
+#### Q-14 What are some best practices for monitoring and logging PySpark jobs ? 
 ```bash
 ```
 
-#### Q-15 
+#### Q-15 How do you deploy PySpark applications in a production environment ?
 ```bash
 ```
 
-#### Q-16 
+#### Q-16 Write a PySpark code to find the top 3 customers with the highest revenue per region ?
 ```bash
 ```
 
-#### Q-17
+#### Q-17 Steps you would take to tune a slow running spark application ?
 ```bash
 ```
 
-#### Q-18
+#### Q-18 Which storage level in persist is optimized for storage ?
 ```bash
 ```
 
-#### Q-19
+#### Q-19 
 ```bash
 ```
 

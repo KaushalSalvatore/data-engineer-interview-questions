@@ -123,11 +123,11 @@ deltaTable = DeltaTable.forPath(spark, "/mnt/delta/orders")
  .execute())
 ```
 
-#### Q-7
+#### Q-7 Implement a Python class that dynamically creates a hierarchical data structure from a flat table with ID, ParentID, and Value columns ? 
 ```bash
 ```
 
-#### Q-8
+#### Q-8 Develop a program to read a CSV file, extract unique values from a column, and save the results in a new file and dataframe ? 
 ```bash
 ```
 
