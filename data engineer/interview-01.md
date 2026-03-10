@@ -290,22 +290,126 @@ and cluster resources if required.
 
 #### Q-14 What are some best practices for monitoring and logging PySpark jobs ? 
 ```bash
+1. Use Spark UI for Job Monitoring
+Job stages and tasks
+Execution tim
+Shuffle read/write metrics
+Executor memory usage
+
+2. Implement Structured Logging
+import logging
+
+logger = logging.getLogger("pyspark_job")
+
+logger.info("Starting data transformation")
+logger.error("Data load failed")
+
+3. Track Job Metrics
+Record counts
+Processing time
+Input/output data size
+Failed records
+
+4. Integrate with Monitoring Tools
+Grafana
+
+5. Configure Alerts and Notifications
+Email
+Slack
+PagerDuty
 ```
 
 #### Q-15 How do you deploy PySpark applications in a production environment ?
 ```bash
+pyspark_project/
+ ├── main.py
+ ├── config/
+ │    └── config.yaml
+ ├── utils/
+ │    └── transformations.py
+ ├── requirements.txt
+
+ Git Repository
+      ↓
+CI/CD Pipeline
+      ↓
+Build PySpark Package
+      ↓
+Airflow Scheduler
+      ↓
+spark-submit
+      ↓
+Spark Cluster (YARN/Kubernetes)
+      ↓
+Data Lake / Warehouse
 ```
 
 #### Q-16 Write a PySpark code to find the top 3 customers with the highest revenue per region ?
 ```bash
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, sum, rank
+from pyspark.sql.window import Window
+
+# Create Spark session
+spark = SparkSession.builder.appName("TopCustomersPerRegion").getOrCreate()
+
+# Sample data
+data = [
+    ("North", "C1", 500),
+    ("North", "C2", 700),
+    ("North", "C3", 300),
+    ("North", "C4", 900),
+    ("South", "C1", 400),
+    ("South", "C2", 800),
+    ("South", "C3", 200),
+    ("South", "C4", 600)
+]
+
+columns = ["region", "customer_id", "revenue"]
+
+df = spark.createDataFrame(data, columns)
+
+# Aggregate revenue per customer per region
+revenue_df = df.groupBy("region", "customer_id") \
+               .agg(sum("revenue").alias("total_revenue"))
+
+# Define window partitioned by region
+window_spec = Window.partitionBy("region").orderBy(col("total_revenue").desc())
+
+# Rank customers
+ranked_df = revenue_df.withColumn("rank", rank().over(window_spec))
+
+# Filter top 3 customers per region
+top_customers = ranked_df.filter(col("rank") <= 3)
+
+top_customers.show()
 ```
 
 #### Q-17 Steps you would take to tune a slow running spark application ?
 ```bash
+1. Analyze Spark UI
+2. Optimize Data Partitioning
+3. Reduce Data Shuffling
+4. Use Broadcast Joins
+5. Handle Data Skew
+6. Cache Reused Data
+7. Optimize File Formats
 ```
 
 #### Q-18 Which storage level in persist is optimized for storage ?
 ```bash
+the persist() method allows you to store DataFrames or RDDs in memory or disk using different storage levels.
+
+from pyspark import StorageLevel
+df.persist(StorageLevel.MEMORY_ONLY_SER)
+
+| Storage Level           | Description                                                       |
+| ----------------------- | ----------------------------------------------------------------- |
+| **MEMORY_ONLY**         | Stores deserialized objects in memory (fast but uses more memory) |
+| **MEMORY_ONLY_SER**     | Stores serialized objects in memory (memory efficient)            |
+| **MEMORY_AND_DISK**     | Stores in memory, spills to disk if memory is insufficient        |
+| **MEMORY_AND_DISK_SER** | Serialized in memory and disk                                     |
+| **DISK_ONLY**           | Stores data only on disk                                          |
 ```
 
 #### Q-19 
