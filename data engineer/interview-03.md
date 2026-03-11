@@ -348,28 +348,178 @@ Advanced Spark optimization
 
 #### Q-14 How do you implement audit logging for a data pipeline using SQL procedures and triggers?
 ```bash
+Audit Pipeline Example Flow
+Data Pipeline
+      ↓
+Insert / Update / Delete
+      ↓
+Trigger Fires
+      ↓
+Stored Procedure Executes
+      ↓
+Audit Log Table Updated
+
+Benefits of Audit Logging
+Data lineage tracking
+Regulatory compliance
+Debugging pipeline errors
+Monitoring data changes
+
+To implement audit logging in a data pipeline, I create an audit table to store change history. Then I use SQL triggers 
+on target tables to capture INSERT, UPDATE, and DELETE operations. The trigger calls a stored procedure that writes old 
+values, new values, user, and timestamp into the audit table. This ensures every data change in the pipeline is logged automatically.
 ```
 
 #### Q-15  You have a huge text file, how would you replicate a given row "n" number of times, write a code for this ?
 ```bash
+For a huge text file, I would process it line by line using streaming instead of loading it into memory. When the target 
+row is reached, I would write that row n times to the output file, ensuring the solution works efficiently for very large datasets.
 ```
 
 #### Q-16 How is deployment done in your project ? Explain about development/testing etc. ?
 ```bash
+1️⃣ Development Environment (DEV)
+Create dbt models
+Write SQL transformations
+Develop Airflow DAGs
+Create staging tables in Snowflake
+Test logic with sample data
+
+2️⃣ Version Control (Git)
+Main Branch (Production)
+      ↑
+Pull Request
+      ↑
+Feature Branch (Developer)
+
+3️⃣ Testing / QA Environment
+
+4️⃣ CI/CD Pipeline
+Jenkins
+GitHub Actions
+
+5️⃣ Production Deployment
+Airflow DAG
+     ↓
+Load data into Snowflake
+     ↓
+Run dbt transformations
+     ↓
+Create final analytics tables
 ```
 
-#### Q-17  Explain dimensional modeling and how you would design a sales fact table with product and customer dimensions ?
+#### Q-17 Explain dimensional modeling and how you would design a sales fact table with product and customer dimensions ?
 ```bash
+Components of Dimensional Modeling :-
+1. Fact Table
+Stores numeric measurements.
+
+sales_amount
+quantity
+discount
+
+2. Dimension Table
+Stores descriptive attributes used for filtering and grouping.
+
+product name
+customer city
+product category
 ```
 
 #### Q-18 How would you design a fact table for an e-commerce platform ?
 ```bash
+                     Dim_Date
+                        |
+                        |
+Dim_Customer ---- Fact_Order_Items ---- Dim_Product
+                        |
+                        |
+                   Dim_Payment
+                        |
+                        |
+                   Dim_Promotion
+
+Fact table → contains measures
+
+Dimension tables → contain descriptive attributes
 ```
 
 #### Q-19 How would you design a data warehouse for a retail business using Synapse ?
 ```bash
+1️⃣ Data Sources (Retail Systems)
+Sales Transactions
+Customer Data
+Product Catalog
+Inventory Updates
+Store Data
+
+2️⃣ Data Ingestion Layer (AWS)
+Raw data is ingested into Amazon S3.
+Batch file uploads (CSV/JSON)
+API ingestion
+Streaming ingestion
+
+3️⃣ Workflow Orchestration
+Pipelines are orchestrated using Apache Airflow.
+Airflow responsibilities:
+Trigger ingestion pipelines
+Load data to Snowflake
+Run dbt models
+Monitor pipeline failures
+
+4️⃣ Data Warehouse Layer
+S3 Raw Data
+      ↓
+Snowflake Stage
+      ↓
+Staging Tables
+
+5️⃣ Data Transformation with dbt
+
+7️⃣ Data Flow Architecture
+Retail Systems
+      ↓
+Amazon S3 (Raw Data Lake)
+      ↓
+Apache Airflow (Orchestration)
+      ↓
+Snowflake (Data Warehouse)
+      ↓
+dbt (Transformations & Models)
+      ↓
+Analytics / BI Tools
 ```
 
-#### Q-20 How would you handle late-arriving data in a batch ETL pipeline ?
+#### Q-20 How would you handle late-arriving data in a batch ETL pipeline in pyspark ?
 ```bash
+1️⃣ Use Event Time vs Ingestion Time
+event_time → when the event actually happened
+ingestion_time → when the data arrived
+
+from pyspark.sql.functions import col
+df_late = df.filter(col("event_time") < col("ingestion_time"))
+
+2️⃣ Sliding Window Reprocessing
+from pyspark.sql.functions import current_date, date_sub, col
+
+df = spark.read.parquet("s3://data/events")
+
+df_filtered = df.filter(
+    col("event_date") >= date_sub(current_date(), 3)
+)
+
+3️⃣ Upsert / Merge Logic
+from delta.tables import DeltaTable
+
+target = DeltaTable.forPath(spark, "s3://data/target")
+
+target.alias("t").merge(
+    source_df.alias("s"),
+    "t.id = s.id"
+).whenMatchedUpdateAll() \
+ .whenNotMatchedInsertAll() \
+ .execute()
+
+ 4️⃣ Partition-Based Reprocessing
+ df = spark.read.parquet("s3://data/events/year=2026/month=03/day=10")
 ```
