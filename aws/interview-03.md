@@ -1,9 +1,50 @@
 #### Q-1 What is AWS Lambda Layers, and how can they be used to share code and libraries across multiple functions ?
 ```bash
+A Lambda Layer is a ZIP archive that contains libraries, runtime dependencies, or custom code.
+Typical contents include:
+Python libraries (NumPy, Pandas)
+Node.js packages
+Custom utility modules
+Shared configuration files
+SDK extensions
+
+                +----------------+
+                | Lambda Layer   |
+                |  - pandas      |
+                |  - numpy       |
+                |  - utils.py    |
+                +--------+-------+
+                         |
+        -------------------------------------
+        |                |                 |
+   Lambda A         Lambda B          Lambda C
+  ETL Job         API Handler       Data Cleaner
 ```
 
 #### Q-2 Explain the concept of AWS Step Functions and how they can be used in conjunction with Lambda functions to build complex workflows ?
 ```bash
+How Step Functions Work with Lambda
+Lambda functions handle individual tasks, while Step Functions handle workflow coordination.
+
+Step Functions (Orchestrator)
+        |
+        |---- Lambda 1 (Extract Data)
+        |
+        |---- Lambda 2 (Transform Data)
+        |
+        |---- Lambda 3 (Load Data)
+
+Types of Step Functions
+
+Standard Workflows
+Best for:
+long-running workflows
+complex orchestration
+
+Express Workflows
+Best for:
+high-volume event processing
+streaming pipelines
 ```
 
 #### Q-3 What are the constraints that AWS lambda function imposes ?
