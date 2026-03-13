@@ -123,11 +123,45 @@ deltaTable = DeltaTable.forPath(spark, "/mnt/delta/orders")
  .execute())
 ```
 
-#### Q-7 Implement a Python class that dynamically creates a hierarchical data structure from a flat table with ID, ParentID, and Value columns ? 
+#### Q-7 Develop a program to read a CSV file, extract unique values from a column, and save the results in a new file and dataframe ? 
 ```bash
+1️⃣ Using PySpark (Best for Databricks / Big Data)
+from pyspark.sql import SparkSession
+
+# Create Spark session
+spark = SparkSession.builder.appName("UniqueValues").getOrCreate()
+
+# Read CSV file
+df = spark.read.csv("input_file.csv", header=True, inferSchema=True)
+
+# Extract unique values from a column
+unique_df = df.select("column_name").distinct()
+
+# Show results
+unique_df.show()
+
+# Save results to a new CSV file
+unique_df.write.mode("overwrite").csv("output_unique_values", header=True)
+
+2️⃣ Using Pandas (Best for Small Files)
+import pandas as pd
+
+# Read CSV file
+df = pd.read_csv("input_file.csv")
+
+# Extract unique values
+unique_values = df["column_name"].drop_duplicates()
+
+# Convert to dataframe
+unique_df = pd.DataFrame(unique_values)
+
+# Save to new CSV file
+unique_df.to_csv("unique_values.csv", index=False)
+
+print(unique_df)
 ```
 
-#### Q-8 Develop a program to read a CSV file, extract unique values from a column, and save the results in a new file and dataframe ? 
+#### Q-8 
 ```bash
 ```
 
