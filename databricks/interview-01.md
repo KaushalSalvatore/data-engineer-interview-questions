@@ -12,101 +12,403 @@ It manages:
 The security + control center for all your data in Databricks.
 ```
 
-#### Q-2 How do you optimize Spark jobs to run faster when dealing with terabytes of data ?
+#### Q-2 What do you understand about Databricks ?
+```bash
+A central workshop where raw data comes in, gets cleaned, analyzed, and turned into insights or AI models—without 
+needing separate tools for each step.
+
+Databricks is a unified data platform that lets teams:
+Process large-scale data
+Build machine learning models
+Run analytics and dashboards
+Collaborate across data teams
+
+It runs on major cloud providers like:
+AWS
+Azure (as Azure Databricks)
+Google Cloud
+
+Key Concepts
+
+1. Lakehouse Architecture
+Databricks popularized the Lakehouse concept:
+Combines a data lake (cheap storage, flexible)
+With a data warehouse (structured, fast querying)
+
+This is powered by:
+Delta Lake – adds reliability, ACID transactions, and versioning to data lakes
+
+2. Apache Spark Integration
+3. Collaborative Workspace
+Notebooks (Python, SQL, Scala, R)
+Shared dashboards
+Real-time collaboration
+
+4. Machine Learning & AI
+5. Data Engineering & ETL
+Used to:
+Clean and transform raw data (ETL/ELT)
+Build data pipelines
+Schedule jobs
+```
+
+#### Q-3 databricks vs snowflake ? 
+```bash
+| Aspect     | Databricks                      | Snowflake                              |
+| ---------- | ------------------------------- | -------------------------------------- |
+| Core Idea  | Data + AI platform (lakehouse)  | Cloud data warehouse (analytics-first) |
+| Best For   | Data engineering, ML, big data  | BI, SQL analytics, reporting           |
+| Users      | Data engineers, data scientists | Data analysts, business users          |
+| Complexity | More flexible, but harder       | Easier, more plug-and-play             |
+
+1. Architecture Difference (Biggest Concept)
+Databricks → Lakehouse
+Combines data lake + warehouse
+Handles structured + unstructured data
+Built on Apache Spark
+Uses Delta Lake
+
+👉 Great for:
+Raw data (logs, images, streaming)
+AI/ML pipelines
+
+Snowflake → Data Warehouse
+Fully managed SaaS platform
+Optimized for structured data + SQL
+Separates storage & compute cleanly
+
+👉 Great for:
+Dashboards
+Business reporting
+
+2. Use Case Split (Very Important)
+-> Choose Databricks if you want:
+Machine learning / AI pipelines
+Real-time streaming data
+Complex ETL pipelines
+Data science workflows
+
+-> Choose Snowflake if you want:
+Fast SQL analytics
+BI dashboards (Power BI, Tableau)
+Data sharing across teams
+
+3. Performance (Depends on Workload)
+-> Databricks
+Faster for:
+ETL pipelines
+Big data processing
+ML workloads
+
+-> Snowflake
+Faster for:
+SQL queries
+Business analytics
+High concurrency
+
+4. Governance & Security
+
+-> Snowflake
+Strong out-of-the-box governance
+Easier compliance setup
+
+-> Databricks
+Flexible governance (Unity Catalog)
+More customizable, but requires setup
+```
+
+#### Q-4 What is the core architecture of Databricks ?
+```bash
+Databricks has two main layers:
+
+1. Control Plane (Managed by Databricks)
+UI (workspace, notebooks)
+Job scheduling
+Cluster management
+Security & access control
+👉 This layer is fully managed by Databricks.
+
+2.  Data Plane (In Your Cloud Account)
+Actual data storage (S3 / ADLS / GCS)
+Compute clusters (VMs running Spark)
+Data processing happens here
+👉 This ensures:
+You own your data
+Better security & compliance
+
+
+Core Building Blocks 
+A. Storage Layer (Data Lake)
+Stores raw and processed data
+Uses cloud storage:
+AWS S3
+
+Delta Lake
+Adds:
+ACID transactions
+Schema enforcement
+Time travel (versioning)
+
+B. Compute Layer
+Powered by:
+Apache Spark
+
+Key features:
+Distributed processing across clusters
+Auto-scaling
+
+Supports:
+Batch processing
+Streaming
+
+👉 Clusters can be:
+Interactive (for notebooks)
+Job clusters (for pipelines)
+
+C. Workspace Layer
+Collaborative notebooks (Python, SQL, Scala, R)
+Dashboards
+Version control
+
+D. ML & AI Layer
+Includes:
+MLflow (experiment tracking)
+Feature Store
+Model serving APIs
+
+E. Governance Layer
+Unity Catalog (central governance)
+Data access control
+Lineage tracking
+```
+
+#### Q-5 How to set up and manage clusters ?
+```bash
+1. How to Create a Cluster
+Step 1: Go to Clusters
+In Databricks UI → Click Compute / Clusters
+
+Step 2: Click “Create Cluster”
+
+Key Configuration Settings
+1. Cluster Mode
+Single Node → for testing
+Standard → most common
+High Concurrency → many users (BI tools)
+
+2. Databricks Runtime (Very Important)
+Pre-installed environment with Spark + libraries
+👉 Example:
+Latest runtime (recommended)
+ML runtime (for AI projects)
+
+3. Node Type (VM Size)
+Defines CPU, RAM
+👉 Example:
+Small → dev work
+Large → big data processing
+
+4. Workers (Scaling)
+Fixed size → manual
+Autoscaling → recommended
+
+👉 Example:
+Min: 2
+Max: 8
+
+5. Auto Termination
+Stops cluster after inactivity
+👉 Example:
+30 minutes (saves cost)
+
+6. Access Mode
+Single user
+Shared
+No isolation
+
+3. Types of Clusters (Important)
+
+🧪 1. All-Purpose Cluster
+Interactive use
+Notebooks
+Development
+
+⚙️ 2. Job Cluster
+Created automatically for jobs
+Terminates after completion
+
+👉 Best for production pipelines
+
+👥 3. High-Concurrency Cluster
+Multiple users
+BI tools (Power BI, Tableau)
+
+💰 4. Cost Optimization Tips (Very Important)
+Use autoscaling
+Enable auto-termination
+Prefer job clusters for pipelines
+Avoid idle clusters
+```
+
+#### Q-6 List the best practices for ETL processes in Databricks ? 
+```bash
+1. Use Medallion Architecture (Must Follow)
+2. Use Delta Lake for Storage
+3. Build Incremental ETL Pipelines (MERGE , change data capture)
+4. Optimize Spark Jobs
+5. Partition Data Properly
+6. Ensure Data Quality in Silver Layer
+7. Make Pipelines Idempotent (Meaning:Running the same job multiple times gives the same result)
+(Use MERGE instead of INSERT , Avoid duplicate writes)
+8. Automate with Workflows
+9. Implement Data Governance
+```
+
+#### Q-7 How to maintain data security ?
+```bash
+1. Use Centralized Governance (Unity Catalog)
+Centralizes access control
+Tracks data lineage
+Manages permissions at:Catalog,Schema,Table,Column level
+
+2. Role-Based Access Control (RBAC)
+Give users only what they need (Principle of Least Privilege)
+Analyst → read-only access
+Engineer → read + write
+Admin → full control
+
+3. Authentication & Identity Management
+Integrate with:
+Azure AD / AWS IAM / Google IAM
+
+4. Data Encryption (Must Have)
+At Rest:
+Data stored in encrypted form (cloud storage)
+
+5. Data Masking & Column-Level Security
+Protect sensitive data like:
+Emails
+Phone numbers
+Financial data
+
+6. Data Isolation (Separate environments:)
+Dev
+Test
+Prod
+```
+
+#### Q-8 How to optimize the performance of Databricks ?
+```bash
+1. Use Delta Lake Optimizations
+Key features to use:
+OPTIMIZE → compacts small files
+Z-ORDER → improves query performance
+OPTIMIZE sales ZORDER BY (customer_id);
+
+2. Fix the Small Files Problem
+Too many small files = slow queries ❌
+Solution:
+Use OPTIMIZE
+Use Auto Optimize (Databricks feature)
+👉 Ideal file size:
+~100MB–1GB per file
+
+3. Partition Data Properly
+Partition by:
+Date (most common)
+Region / category
+
+4. Optimize Spark Jobs
+Best practices:
+Use broadcast joins for small tables
+Avoid unnecessary shuffles
+Filter early (WHERE clause first)
+Select only required columns
+
+5. Use Caching Smartly
+df.cache()
+
+6. Tune Cluster Configuration
+Right-size clusters:
+Too small → slow
+Too large → costly
+Use:
+Autoscaling
+Latest runtime
+```
+
+#### Q-9 How to implement CI/CD pipelines in Databricks ?
+```bash
+-> CI (Continuous Integration)
+Developers push code → automatically:
+Validate
+Test
+Build
+
+-> CD (Continuous Deployment)
+Automatically deploy code to:
+Dev → QA → Production
+
+-> Core Components of Databricks CI/CD
+You typically use:
+Git (GitHub / Azure DevOps / GitLab)
+Databricks Repos
+CI/CD tools (Azure DevOps, GitHub Actions)
+Databricks CLI / REST APIs
+
+Developer commits code
+        ↓
+CI Pipeline runs tests
+        ↓
+Build artifacts created
+        ↓
+CD deploys to Dev
+        ↓
+Test → QA validation
+        ↓
+Deploy to Production
+```
+
+#### Q-10 What are Delta Live Tables (DLT) and how do they benefit ETL pipelines ?
 ```bash
 ```
 
-#### Q-3 Explain Slowly Changing Dimensions (SCD Type 2). How would you implement it in Spark ?
+#### Q-11 What is the Photon Engine in Databricks SQL ?
 ```bash
 ```
 
-#### Q-4 Explain optimization techniques in Spark ?
-```bash
-1. Use Efficient File Formats
-Parquet
-ORC
-
-2. Partitioning & Data Layout Optimization
-
-3. Reduce Shuffle (Most Important 🔥)
-Shuffle = disk + network + memory.
-Techniques:Filter before join,Avoid unnecessary groupBy,Avoid distinct unless required
-Use map-side operations
-
-4. Join Optimization
--> Broadcast Join
-from pyspark.sql.functions import broadcast
-df_large.join(broadcast(df_small), "id")
--> Handle Data Skew (Key salting)
--> Tune Spark Configurations
-spark.sql.shuffle.partitions
-executor memory
-executor cores
-driver memory
-
-5. Caching & Persistence
-```
-
-#### Q-5 Write a PySpark code to process streaming data from Event Hub in Databricks ?
+#### Q-12 What is Lakehouse Architecture in Azure Databricks and why is it important ?
 ```bash
 ```
 
-#### Q-6
+#### Q-13 What is Serverless Compute in Azure Databricks and how does it benefit enterprises ?
 ```bash
 ```
 
-#### Q-7
+#### Q-14 How does Unity Catalog enhance data governance in large organizations ?
 ```bash
 ```
 
-#### Q-8
+#### Q-15 How does Databricks support real-time analytics and streaming pipelines in modern data architectures ?
 ```bash
 ```
 
-#### Q-9
+#### Q-16 What is a Databricks job cluster ?
 ```bash
 ```
 
-#### Q-10
+#### Q-17 What is DBFS ?
 ```bash
 ```
 
-#### Q-11
+#### Q-18 What actions should I take to resolve the issues I'm having with Azure Databricks ?
 ```bash
 ```
 
-#### Q-12
-```bash
+#### Q-19 How do you handle streaming data in Databricks?
+```bash 
 ```
 
-#### Q-13
-```bash
-```
-
-#### Q-14
-```bash
-```
-
-#### Q-15
-```bash
-```
-
-#### Q-16
-```bash
-```
-
-#### Q-17
-```bash
-```
-
-#### Q-18
-```bash
-```
-
-#### Q-19
-```bash
-```
-
-#### Q-20
+#### Q-20 What is the purpose of the Delta Lake Change Data Feed (CDF)?
 ```bash
 ```

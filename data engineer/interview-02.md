@@ -161,7 +161,7 @@ unique_df.to_csv("unique_values.csv", index=False)
 print(unique_df)
 ```
 
-#### Q-8 
+#### Q-8 What is the difference between a temporary view and a global view in Spark?
 ```bash
 ```
 

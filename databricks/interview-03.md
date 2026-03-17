@@ -62,18 +62,18 @@
 ```bash
 ```
 
-#### Q-17
+#### Q-17 Is it possible to run Databricks on a private cloud ?
 ```bash
 ```
 
-#### Q-18
+#### Q-18 A team has a Databricks job that needs frequent joins among a large fact table and many dimension tables. How will they optimize the join operations for better performance ?
 ```bash
 ```
 
-#### Q-19
+#### Q-19 A Databricks notebook is not running at its full potential due to big shuffle operations. How to identify and resolve this issue ?
 ```bash
 ```
 
-#### Q-20
+#### Q-20 Write a PySpark code to process streaming data from Event Hub in Databricks ?
 ```bash
 ```
