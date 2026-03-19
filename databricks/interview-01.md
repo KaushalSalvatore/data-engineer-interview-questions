@@ -539,20 +539,130 @@ Handles late-arriving data
 
 #### Q-16 What is a Databricks job cluster ?
 ```bash
+A Job Cluster in Databricks is a temporary (ephemeral) cluster that is automatically created to run a specific job 
+and terminated once the job finishes.
+🔄 Workflow
+Job Trigger → Cluster Created → Job Runs → Cluster Terminated
+
+Key Features
+-> Ephemeral (Temporary)
+Exists only during job execution
+
+-> Fully Automated
+No manual cluster management
+
+-> Cost Efficient 💰
+No idle time → pay only when used
+
+-> Isolated Execution
+Each job runs in its own environment
+No interference with other workloads
 ```
 
 #### Q-17 What is DBFS ?
 ```bash
+DBFS is a distributed file system in Databricks that provides a unified interface to access and manage data stored 
+in underlying cloud storage like S3 or ADLS.
+
+DBFS is a distributed file system in Databricks that acts as an abstraction layer over cloud storage like 
+S3 or ADLS, allowing users to access data using simple file paths and integrate seamlessly with Spark.
+
+How DBFS Works (Databricks File System)
+DBFS is not actual storage
+It sits on top of:
+AWS S3
+Azure Data Lake Storage (ADLS)
+Google Cloud Storage
+👉 It makes cloud storage look like a local file system
 ```
 
 #### Q-18 What actions should I take to resolve the issues I'm having with Azure Databricks ?
 ```bash
+Step 1: Identify the Type of Issue
+❌ Job failure
+🐢 Slow performance
+🔐 Permission / access issue
+⚙️ Cluster not starting
+📊 Incorrect data
+
+Step 2: Check Logs & Error Messages
+Step 3: Debug Spark Execution
+Step 4: Validate Data Issues
+Step 5: Optimize Performance Issues
+Step 6: Restart / Reconfigure Cluster
+Step 9: Monitor Jobs
+
+Most Databricks issues are related to data quality, improper partitioning, or cluster misconfiguration, so I 
+focus on those areas first.
 ```
 
 #### Q-19 How do you handle streaming data in Databricks?
 ```bash 
+In Databricks, I handle streaming data using Spark Structured Streaming for real-time processing, ingest data from 
+sources like Kafka or cloud storage, apply transformations, and store results in Delta Lake tables. I also use checkpointing
+and watermarking to ensure fault tolerance and handle late-arriving data.
+
+1. Ingest Streaming Data
+Sources:
+Kafka
+Event Hubs
+Cloud storage (Auto Loader)
+
+df = spark.readStream.format("kafka").load()
+
+2. Process Data in Real-Time
+Apply transformations:
+Filtering
+Joins
+Aggregations
+
+3. Handle Late Data (Watermarking)
+df.withWatermark("timestamp", "10 minutes")
+Late data is handled correctly
+Memory is managed efficiently
+
+4. Write to Delta Tables
+processed_df.writeStream \
+    .format("delta") \
+    .option("checkpointLocation", "/mnt/checkpoints") \
+    .table("silver.data")
+
+5. Use Checkpointing (Very Important)
+Stores progress of stream
+👉 Ensures:
+Fault tolerance
+No data loss
+
+6. Build Medallion Architecture
+Bronze → raw stream
+Silver → cleaned data
+Gold → aggregated insights
+
+Key Features Databricks Provides
+🚀 Structured Streaming
+🔁 Incremental Processing
+🔐 Exactly-Once Semantics
+📊 Unified Batch + Streaming
+⚙️ Auto Scaling
+
+🏢 Real Example
+👉 E-commerce app:
+User clicks → event generated
+Data streamed via Kafka
+Databricks processes in real time
+
+Updates:
+Live dashboard
+Recommendation system
+
+I ensure fault tolerance using checkpointing and handle late-arriving data using watermarking, while leveraging
+Delta Lake for exactly-once processing.
 ```
 
 #### Q-20 What is the purpose of the Delta Lake Change Data Feed (CDF)?
 ```bash
+Delta Lake Change Data Feed allows us to track row-level changes such as inserts, updates, and deletes in a 
+table, enabling efficient incremental data processing and downstream data synchronization.
+
+🔄 To process only the changed data instead of the entire dataset
 ```
