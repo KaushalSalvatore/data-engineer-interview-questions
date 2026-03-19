@@ -414,6 +414,20 @@ df.persist(StorageLevel.MEMORY_ONLY_SER)
 
 #### Q-19 How do you optimize Spark jobs to run faster when dealing with terabytes of data ?
 ```bash
+To optimize Spark jobs for large-scale data, I focus on efficient data partitioning, minimizing shuffles, 
+using optimized file formats like Delta, tuning joins, and properly configuring cluster resources. I also 
+monitor Spark UI to identify bottlenecks like skew and long stages.
+
+1. Use Efficient File Formats
+2. Proper Partitioning
+3. Reduce Shuffles (Biggest Performance Killer)
+4. Optimize Joins (Broadcast Join)
+5. Cache Smartly
+6. Tune Cluster Resources
+7. Optimize Number of Partitions
+
+“Most performance issues in Spark come from excessive shuffling and poor partitioning, so I prioritize 
+optimizing those first.”
 ```
 
 #### Q-20 Explain optimization techniques in Spark ?

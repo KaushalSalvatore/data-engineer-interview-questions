@@ -165,8 +165,49 @@ print(unique_df)
 ```bash
 ```
 
-#### Q-9
+#### Q-9 AWS vs Azure servises Mapping Cheat Sheet
 ```bash
+💻 Compute
+
+| AWS               | Azure            |
+| ----------------- | ---------------- |
+| EC2               | Virtual Machines |
+| Auto Scaling      | VM Scale Sets    |
+| Lambda            | Azure Functions  |
+| Elastic Beanstalk | App Service      |
+
+📦 Storage
+| AWS     | Azure           |
+| ------- | --------------- |
+| S3      | Blob Storage    |
+| EBS     | Managed Disks   |
+| EFS     | Azure Files     |
+| Glacier | Archive Storage |
+
+🗄️ Databases
+| AWS      | Azure                      |
+| -------- | -------------------------- |
+| RDS      | Azure SQL Database         |
+| Aurora   | Azure SQL Managed Instance |
+| DynamoDB | Cosmos DB                  |
+| Redshift | Synapse Analytics          |
+
+📊 Data Engineering / Big Data ⭐
+| AWS              | Azure                          |
+| ---------------- | ------------------------------ |
+| EMR              | HDInsight                      |
+| Glue             | Data Factory                   |
+| Kinesis          | Event Hubs                     |
+| Athena           | Synapse Serverless SQL         |
+| Lake Formation   | Azure Data Lake Storage (ADLS) |
+| Databricks (AWS) | Azure Databricks               |
+
+🔐 Identity & Security
+| AWS     | Azure                  |
+| ------- | ---------------------- |
+| IAM     | Azure Active Directory |
+| Cognito | Azure AD B2C           |
+| KMS     | Key Vault              |
 ```
 
 #### Q-10

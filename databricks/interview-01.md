@@ -371,26 +371,170 @@ Deploy to Production
 
 #### Q-10 What are Delta Live Tables (DLT) and how do they benefit ETL pipelines ?
 ```bash
+DLT is a framework where you:
+Define what transformations should happen
+Databricks handles:
+Execution
+Dependency management
+Error handling
+Monitoring
+
+It is built on top of:
+Delta Lake
+Uses Apache Spark under the hood
+
+How DLT Works (Concept)
+@dlt.table
+def clean_sales():
+    return spark.read.table("bronze.sales").filter("amount > 0")
+
+Types of Tables in DLT
+1. Streaming Tables
+For real-time data
+
+2. Materialized Views
+For batch processing
+
+3. Temporary Views
+Intermediate transformations
+
+1. Simplifies ETL Development
+❌ Traditional:
+Write ingestion
+Write transformations
+Manage orchestration manually
+
+✅ DLT:
+Just define transformations
+Everything else is handled automatically
 ```
 
-#### Q-11 What is the Photon Engine in Databricks SQL ?
+#### Q-11 What is the?
 ```bash
+Photon is a vectorized query engine in Databricks that accelerates SQL and Spark workloads by using a 
+C++ execution layer, improving performance and reducing cost.
+
+1. Faster Performance
+Uses vectorized execution (processes data in batches instead of row-by-row)
+Optimized for:Joins, Aggregations, Scans
+
+2. Works with Spark
+Fully compatible with:
+Apache Spark
+
+Normal Spark = Reading one line at a time 📄
+Photon = Reading entire pages at once 📚
+
+Enable Photon
+When creating a SQL warehouse or cluster:
+Turn ON Photon
+
+You write normal SQL queries, and Photon automatically accelerates them.
 ```
 
-#### Q-12 What is Lakehouse Architecture in Azure Databricks and why is it important ?
+#### Q-12 What is Lakehouse Architecture in Databricks and why is it important ?
 ```bash
+Data Lake
+Stores raw data
+Cheap and scalable
+Supports structured + unstructured data
+
+Data Warehouse
+Structured data
+Fast SQL queries
+Strong governance
 ```
 
-#### Q-13 What is Serverless Compute in Azure Databricks and how does it benefit enterprises ?
+#### Q-13 What is Serverless Compute in Databricks and how does it benefit enterprises ?
 ```bash
+Serverless compute in Databricks is a fully managed compute model where infrastructure provisioning, scaling, 
+and maintenance are handled automatically, allowing users to focus only on writing queries and processing data.
 ```
 
 #### Q-14 How does Unity Catalog enhance data governance in large organizations ?
 ```bash
+Unity Catalog is a centralized governance solution in Databricks that provides fine-grained access control, 
+data lineage, and auditing across all data assets, ensuring secure and compliant data usage in large 
+organizations.
+
+1. Centralized Access Control
+Manage permissions in one place (not per workspace)
+👉 Controls at:
+Catalog
+Schema
+Table
+Column level
+
+2. Fine-Grained Security (RBAC)
+Role-Based Access Control (RBAC)
+👉 Example:
+Analyst → read-only
+Engineer → read/write
+Admin → full access
+
+3. Data Lineage (Very Important)
+Tracks:
+Where data comes from
+How it is transformed
+Where it is used
+👉 Helps:
+Debug pipelines
+Understand data flow
+Meet compliance requirements
 ```
 
 #### Q-15 How does Databricks support real-time analytics and streaming pipelines in modern data architectures ?
 ```bash
+Data Source (Kafka / APIs / Logs)
+        ↓
+Ingestion (Auto Loader / Streaming)
+        ↓
+Processing (Spark Structured Streaming)
+        ↓
+Storage (Delta Lake tables)
+        ↓
+Real-time Dashboards / ML / APIs
+
+1. Structured Streaming (Core Engine)
+df = spark.readStream.format("kafka").load()
+
+Step 1: Ingest Streaming Data (Bronze Layer)
+
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+
+# Define schema
+schema = StructType([
+    StructField("order_id", StringType()),
+    StructField("customer_id", StringType()),
+    StructField("amount", DoubleType()),
+    StructField("timestamp", TimestampType())
+])
+
+# Read streaming data (example: Kafka or JSON files)
+raw_df = spark.readStream \
+    .format("json") \
+    .schema(schema) \
+    .load("/mnt/raw/orders")
+
+# Write to Bronze Delta table
+raw_df.writeStream \
+    .format("delta") \
+    .outputMode("append") \
+    .option("checkpointLocation", "/mnt/checkpoints/bronze_orders") \
+    .table("bronze.orders")
+
+Streaming Source → Bronze → Silver → Gold → Dashboard
+
+⚡ Key Concepts Used
+✔️ Streaming Read
+spark.readStream
+✔️ Streaming Write
+writeStream
+✔️ Checkpointing
+Stores progress → ensures fault tolerance
+✔️ Watermarking
+Handles late-arriving data
 ```
 
 #### Q-16 What is a Databricks job cluster ?
