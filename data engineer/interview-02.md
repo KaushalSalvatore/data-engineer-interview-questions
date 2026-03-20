@@ -163,6 +163,27 @@ print(unique_df)
 
 #### Q-8 What is the difference between a temporary view and a global view in Spark?
 ```bash
+A temporary view is session-scoped and accessible only within the current Spark session, while a global temporary 
+view is accessible across multiple sessions within the same application.
+
+| Feature    | Temporary View                | Global Temporary View           |
+| ---------- | ----------------------------- | ------------------------------- |
+| Scope      | Single session                | Multiple sessions               |
+| Visibility | Only current notebook/session | All notebooks/sessions          |
+| Lifetime   | Ends when session ends        | Ends when application ends      |
+| Naming     | Direct name                   | Must use `global_temp` database |
+
+Temporary View :-
+df.createOrReplaceTempView("sales_view")
+SELECT * FROM sales_view;
+
+Global Temporary View
+df.createOrReplaceGlobalTempView("sales_view")
+SELECT * FROM global_temp.sales_view;
+
+The main difference is scope: temporary views are session-specific and disappear when the session ends, whereas 
+global temporary views are shared across sessions and persist for the lifetime of the Spark application, and must 
+be accessed using the global_temp database.
 ```
 
 #### Q-9 AWS vs Azure servises Mapping Cheat Sheet
