@@ -338,11 +338,11 @@ Real-time streaming
 Advanced Spark optimization
 ```
 
-#### Q-12 
+#### Q-12 How would you design a data pipeline to handle daily logs from multiple sources ?
 ```bash
 ```
 
-#### Q-13
+#### Q-13 How would you optimize a slow-performing JOIN query joining large tables? What indexing or partitioning strategies would you use ?
 ```bash
 ```
 

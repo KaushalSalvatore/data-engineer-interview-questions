@@ -57,35 +57,35 @@ Customer lifetime value
 🧠 Purpose: “Make data useful for decision-making”
 ```
 
-#### Q-2
+#### Q-2 How do you schedule jobs in Databricks?
 ```bash
 ```
 
-#### Q-3
+#### Q-3 Describe the Databricks Runtime ? 
 ```bash
 ```
 
-#### Q-4
+#### Q-4 Explain the role of a driver in a Spark cluster ? 
 ```bash
 ```
 
-#### Q-5
+#### Q-5 What is Auto Loader ?
 ```bash
 ```
 
-#### Q-6
+#### Q-6 How do you manage cluster configurations in Databricks ?
 ```bash
 ```
 
-#### Q-7
+#### Q-7 How do you implement data lineage in Databricks ?
 ```bash
 ```
 
-#### Q-8
+#### Q-8 What are the best practices for optimizing Delta Lake performance ?
 ```bash
 ```
 
-#### Q-9
+#### Q-9 How do you handle schema evolution in a Parquet file ?
 ```bash
 ```
 
