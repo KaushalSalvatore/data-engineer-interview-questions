@@ -89,12 +89,50 @@ Customer lifetime value
 ```bash
 ```
 
-#### Q-10
+#### Q-10 What is watermarking in streaming data processing ?
 ```bash
 ```
 
-#### Q-11
+#### Q-11 what is Z ordering in databricks ?  
 ```bash
+Z-Ordering is a technique in Delta Lake that co-locates related data in the same files based on specified columns, 
+improving data skipping and query performance.
+
+Why Do We Need Z-Ordering?
+When data is stored in a data lake:
+Data is spread across many files
+Queries scan many unnecessary files
+👉 Result:
+Slow queries
+
+What Z-Ordering Does
+Z-Ordering:
+Reorders data inside files
+Groups similar values together
+
+👉 So queries can:
+Skip irrelevant files
+Read only required data
+
+Without Z-Ordering
+| customer_id | region | amount |
+| ----------- | ------ | ------ |
+| 101         | US     | 100    |
+| 202         | India  | 200    |
+| 101         | US     | 150    |
+| 303         | UK     | 300    |
+
+With Z-Ordering on customer_id
+| customer_id | region | amount |
+| ----------- | ------ | ------ |
+| 101         | US     | 100    |
+| 101         | US     | 150    |
+| 202         | India  | 200    |
+| 303         | UK     | 300    |
+
+How to Apply Z-Ordering
+OPTIMIZE sales
+ZORDER BY (customer_id);
 ```
 
 #### Q-12

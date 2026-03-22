@@ -340,10 +340,72 @@ Advanced Spark optimization
 
 #### Q-12 How would you design a data pipeline to handle daily logs from multiple sources ?
 ```bash
+Step 1: Data Ingestion (Multiple Sources)
+Sources:
+Application logs
+Server logs
+APIs
+IoT devices
+
+Tools:
+Streaming:
+Kafka / Event Hubs
+Batch:
+Azure Data Factory
+
+Strategy:
+Real-time logs → streaming
+Daily logs → batch ingestion
+
+Step 2: Landing Zone (Raw Storage)
+👉 Use:
+Data Lake (ADLS / S3)
+👉 Store logs in:
+/raw/logs/source_name/date/
+
+Step 3: Processing Layer
+👉 Use:
+Databricks
+Powered by Apache Spark
+
+Step 4: Medallion Architecture
+🥉 Bronze (Raw Logs)
+🥈 Silver (Cleaned Logs)
+🥇 Gold (Aggregated Logs)
+
+Step 5: Storage Format
+👉 Use:
+Delta Lake
+
+🔹 Step 6: Orchestration
+👉 Use:
+Databricks Workflows
+OR
+ADF pipelines
+
+👉 Schedule:
+Daily / near real-time
+
+Step 7: Data Governance
+👉 Use:
+Unity Catalog
+👉 Manage:
+Access control
+Data lineage
 ```
 
 #### Q-13 How would you optimize a slow-performing JOIN query joining large tables? What indexing or partitioning strategies would you use ?
 ```bash
+To optimize joins:
+Use broadcast joins for small tables
+Partition data on join keys
+Reduce shuffle
+Use Delta optimizations (Z-ordering)
+Handle skew
+Tune Spark configs
+
+Most performance issues in joins come from shuffle and data skew, so I focus on minimizing data movement and 
+ensuring balanced partitioning.
 ```
 
 #### Q-14 How do you implement audit logging for a data pipeline using SQL procedures and triggers?
