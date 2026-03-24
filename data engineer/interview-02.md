@@ -231,28 +231,115 @@ be accessed using the global_temp database.
 | KMS     | Key Vault              |
 ```
 
-#### Q-10
+#### Q-10 In Snowflake, you are implementing a data loading strategy for a high-volume streaming scenario where data arrives continuously and needs to be available for querying within minutes. Which combination of Snowflake features provides the optimal solution ?
 ```bash
+The optimal solution is:👉 Snowpipe + Streams + Tasks
+
+-> Why this combination is best for near real-time streaming:
+1. Snowpipe
+Automatically ingests data as soon as it lands in cloud storage
+Event-driven (via notifications) → low latency (seconds to minutes)
+Eliminates need for manual or scheduled loads
+
+2. Streams
+Tracks incremental changes (CDC) in loaded tables
+Allows you to process only new or changed data, not full reloads
+
+3. Tasks
+Automates downstream transformations
+Can run on a schedule or trigger-based workflow
+Enables continuous pipelines (ELT pattern)
+
+-> How they work together:
+1. Data lands in cloud storage (e.g., S3)
+2. Snowpipe ingests it automatically into staging tables
+3. Streams capture newly ingested data
+4. Tasks process and transform that data into final tables
 ```
 
-#### Q-11
+#### Q-11 Your ETL pipeline processes financial data where data quality is critical. You need to implement comprehensive validation that checks for referential integrity, business rule compliance, and statistical anomalies. Which approach provides the most robust validation framework ? 
 ```bash
+A layered validation framework combining constraints, business rules, and anomaly detection with strong logging 
+and alerting.
+
+A single technique is not enough for financial-grade data quality. You need multiple layers of validation working 
+together:
+
+1. Structural & Referential Integrity
+Enforce primary/foreign key constraints (where possible)
+Validate relationships between tables (e.g., transactions ↔ accounts)
+Catch missing or orphaned records early
+
+2. Business Rule Validation
+Implement custom validation logic (e.g., balance ≥ 0, transaction limits)
+Use rule engines or validation functions for maintainability
+Example: reject trades outside allowed thresholds
+
+3. Statistical / Anomaly Detection
+Detect outliers using:
+Z-score / standard deviation
+Historical trend comparisons
+Volume spikes or unusual patterns
+
+4. Logging, Auditing, and Alerting
+Capture detailed validation errors (row-level + rule-level)
+Maintain audit trails for compliance
+Trigger alerts for critical failures
 ```
 
-#### Q-12
+#### Q-12 Your Python ETL application needs robust error handling for various failure scenarios: network timeouts, data format errors, memory issues, and external service failures. Which error handling strategy provides the best resilience ?
 ```bash
+A robust ETL system must handle different failure types differently, not with a one-size-fits-all approach.
+1. Use Specific Exception Handling
+Catch granular exceptions instead of generic ones:
+TimeoutError, ConnectionError → network issues
+ValueError, TypeError → data format issues
+MemoryError → resource constraints
+Create custom exceptions for ETL-specific failures
+
+2. Implement Retries with Exponential Backoff
+Retry only transient failures (e.g., network, external APIs)
+Use exponential backoff + jitter to avoid overload
+
+3. Centralized Logging & Alerting
+Log:
+Error type
+Context (job ID, record ID)
+Stack trace
+Send alerts for critical failures
 ```
 
-#### Q-13
+#### Q-13 In Snowflake's multi-cluster warehouse architecture, you notice that your ETL jobs are experiencing queue wait times during peak hours. Your warehouse is set to auto-suspend after 10 minutes and auto-resume on query. What is the most cost-effective solution to reduce wait times while maintaining performance ?
 ```bash
+Use multi-cluster auto-scaling to handle concurrency spikes instead of resizing the warehouse — it reduces queue 
+time while staying cost-efficient.
+
+Cost-effectiveness:
+You only pay for extra clusters when they are actually used
+Keeps auto-suspend (10 min) intact → avoids idle cost
+Avoids over-provisioning a large warehouse all the time
 ```
 
-#### Q-14
+#### Q-14   Your database query performance degrades significantly when filtering on a composite column (first_name + last_name). The table has 100M+ rows and the query is part of a critical ETL process. Which indexing strategy would provide the best performance improvement?
 ```bash
+A composite index on (first_name, last_name) provides the most efficient access path and significantly reduces 
+scan time for large datasets.
+
+CREATE INDEX idx_name ON table(first_name, last_name);
 ```
 
-#### Q-15
+#### Q-15 In SQL query optimization, which approach typically provides the best performance improvement for large dataset joins?
 ```bash
+The best approach is: Adding appropriate indexes on join columns.
+Proper indexing on join keys is the single most impactful optimization for large joins.
+
+most effective clause for improving query performance when filtering large datasets:
+The most effective clause is the WHERE clause
+
+WHERE → filters before grouping/aggregation ✅
+HAVING → filters after aggregation (less efficient)
+DISTINCT → removes duplicates but adds overhead
+ORDER BY → sorts data (expensive, not filtering)
 ```
 
 #### Q-16
