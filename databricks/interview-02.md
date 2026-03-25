@@ -339,12 +339,53 @@ OPTIMIZE sales
 ZORDER BY (customer_id);
 ```
 
-#### Q-12
+#### Q-12 what are schema enforement and schema evolution , and why are they critical ? 
 ```bash
+Schema enforcement means: Data written to a table must strictly match the defined schema
+If schema doesn’t match → write fails ❌
+
+Schema evolution means:Ability to change schema over time without breaking existing data
+
+Why They Are Critical (Databricks Context)
+1. Data Quality (Schema Enforcement)
+Prevents bad or corrupt data
+Ensures consistent structure
+
+2. Flexibility (Schema Evolution)
+Business requirements change
+New fields get added (e.g., new user attributes)
+
+3. Reliable Data Pipelines
+ETL jobs don’t break unexpectedly
+Controlled schema changes
+
+4. Backward Compatibility
+Old data still works
+New schema doesn’t break existing queries
 ```
 
-#### Q-13
+#### Q-13 managed vs unmamnaged table explain with scenario ?
 ```bash
+A managed table is one where : Databricks (or Spark) controls both metadata AND data
+(Fully controlled by Databricks)
+
+🔹 When to Use
+✔ Temporary or intermediate data
+✔ ETL processing tables
+✔ When you don’t care about underlying files
+
+An external table is one where: Databricks manages only metadata, but data stays in your storage
+Data stored in:
+Amazon S3
+Azure Data Lake Storage
+Dropping table → data is NOT deleted
+You control storage
+
+CREATE TABLE sales_external (
+    id INT,
+    amount DOUBLE
+)
+LOCATION 's3://my-bucket/sales/';
 ```
 
 #### Q-14
