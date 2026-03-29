@@ -342,22 +342,249 @@ DISTINCT → removes duplicates but adds overhead
 ORDER BY → sorts data (expensive, not filtering)
 ```
 
-#### Q-16
+#### Q-16 explain me i want to load 100 gb data everyday what would be cluster configuration in spark , databrick configuration and snowflake configration ? 
 ```bash
+Spark Cluster Configuration :-
+Rule of thumb
+1 core ≈ 2–4 GB RAM
+1 executor = 4–5 cores (avoid too large executors)
+Partition size ≈ 128–256 MB
+
+👉 Recommended Cluster 
+| Component           | Config             |
+| ------------------- | ------------------ |
+| Executors           | 8–12               |
+| Cores per executor  | 4                  |
+| Memory per executor | 16–24 GB           |
+| Total cores         | 32–48              |
+| Driver              | 4 cores, 16 GB RAM |
+
+Why this works
+100 GB / 128 MB ≈ 800 partitions
+40 cores → can process in parallel efficiently
+Good balance of shuffle + memory
+
+spark.executor.instances=10
+spark.executor.cores=4
+spark.executor.memory=20g
+spark.sql.shuffle.partitions=400
+spark.default.parallelism=400
+spark.memory.fraction=0.6
+spark.sql.adaptive.enabled=true
+
+☁️ Databricks Configuration
+| Setting      | Value                 |
+| ------------ | --------------------- |
+| Cluster Mode | Autoscaling           |
+| Min Workers  | 4                     |
+| Max Workers  | 12                    |
+| Node Type    | i3.xlarge / r5.xlarge |
+| Runtime      | Latest LTS (Spark 3+) |
+
+
+Key Databricks Features to enable
+Auto-scaling ✅
+Photon Engine (huge performance boost)
+Delta Lake (default storage)
+
+Delta Optimization
+OPTIMIZE table_name
+ZORDER BY (important_column)
+
+VACUUM table_name RETAIN 168 HOURS;
+
+Snowflake Configuration :-
+| Workload           | Warehouse Size |
+| ------------------ | -------------- |
+| 100 GB/day (light) | Small          |
+| Moderate ETL       | Medium         |
+| Heavy joins        | Large          |
+
+CREATE WAREHOUSE etl_wh
+WITH WAREHOUSE_SIZE = 'MEDIUM'
+AUTO_SUSPEND = 60
+AUTO_RESUME = TRUE;
+
+Loading Strategy
+Best approach:
+Use Snowpipe (for near real-time)
+Or COPY INTO (batch loads)
+
+COPY INTO table_name
+FROM @stage/path
+FILE_FORMAT = (TYPE = PARQUET);
+
+🧠 Performance Tips
+Use clustering keys for large tables
+Prefer Parquet over CSV
+Use multi-cluster warehouse for concurrency
+
+Databricks → if doing heavy Spark ETL + ML
+Snowflake → if mostly SQL analytics
+Spark (EMR) → if cost optimization is priority
 ```
 
-#### Q-17
+#### Q-17 What is Delta Lake ? Delta table , Schema in DataFrame and Schema Evolution?
 ```bash
+👉 Delta Lake is a storage layer built on top of data lakes (like S3/ADLS) that brings database-like 
+features to big data.
+Delta Lake is an open-source storage layer that adds ACID transactions, schema enforcement, and versioning 
+on top of data lakes.
+
+A Delta Table is just a table stored in Delta Lake format.
+
+A Delta table is a table stored in Delta Lake format, where data is stored as Parquet files and changes 
+are tracked using a transaction log, enabling versioning and reliable updates.
+
+Schema in DataFrame : Schema defines the structure of a DataFrame, including column names, data types, and nullability.
+id: int
+name: string
+age: int
+
+Schema Evolution : Schema evolution allows us to modify the table structure, such as adding new columns, without breaking existing data or pipelines.
 ```
 
-#### Q-18
+#### Q-18 i have 8 columns requirement is 12 table so how to do it how pipeline effect explain me how to handle in databricks and snowflake ? 
 ```bash
+Existing table → 8 columns
+New requirement → 12 columns
+
+1. How to Handle in Databricks
+
+df.write.format("delta") \
+  .option("mergeSchema", "true") \
+  .mode("append") \
+  .save("path")
+
+spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
+
+What happens internally
+New columns automatically added to table
+Old records → NULL for new columns
+No pipeline failure ✅
+
+📊 Downstream Impact
+BI dashboards may break
+ETL jobs expecting 8 columns may fail
+
+👉 Fix:
+Version your tables (silver → gold layers)
+Communicate schema change
+
+2. How to Handle in Snowflake
+✅ Step 1: Alter Table
+
+ALTER TABLE table_name
+ADD COLUMN new_col1 STRING,
+ADD COLUMN new_col2 STRING,
+ADD COLUMN new_col3 STRING,
+ADD COLUMN new_col4 STRING;
+
+Step 2: Update Load Process
+COPY INTO table_name
+FROM @stage
+FILE_FORMAT = (TYPE = PARQUET);
 ```
 
-#### Q-19
+#### Q-19 ingestion daily data into delta table but some data data is duplicate so how we can handle this and store only unique. show me both approch databicks and snowflake ? 
 ```bash
+1. In Databricks (Delta Lake)
+
+Approach 1: dropDuplicates (simple)
+
+df = df.dropDuplicates(["id"])   # or multiple columns
+
+df.write.format("delta") \
+  .mode("append") \
+  .save("path")
+
+Approach 2: Window-based dedup (best practice)
+
+from pyspark.sql.window import Window
+from pyspark.sql.functions import row_number, col
+
+window = Window.partitionBy("id").orderBy(col("updated_at").desc())
+
+df_clean = df.withColumn("rn", row_number().over(window)) \
+             .filter("rn = 1") \
+             .drop("rn")
+          
+Approach 3: MERGE (Production-grade ✅)
+
+MERGE INTO target t
+USING source s
+ON t.id = s.id
+WHEN MATCHED THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *
+
+❄️ 2. In Snowflake
+✅ Approach 1: DISTINCT / QUALIFY (basic)
+
+SELECT DISTINCT * FROM source_table;
+
+SELECT *
+FROM source_table
+QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1;
+
+🔥 Approach 2: MERGE (Best Practice)
+MERGE INTO target t
+USING source s
+ON t.id = s.id
+WHEN MATCHED THEN UPDATE SET
+  t.col1 = s.col1,
+  t.col2 = s.col2
+WHEN NOT MATCHED THEN INSERT (
+  id, col1, col2
+) VALUES (
+  s.id, s.col1, s.col2
+);
 ```
 
-#### Q-20
+#### Q-20 two large data set customer data transaction data 10 gb and 20 db how join efficiently and avoid skewness Show original results
 ```bash
+I usually start with AQE and only move to salting if skew is still impacting performance.
+
+Case 1: If one dataset is small enough (< ~10 GB compressed)
+👉 Use Broadcast Join
+from pyspark.sql.functions import broadcast
+df = transactions.join(broadcast(customers), "customer_id")
+✅ Why?
+Avoids shuffle completely
+Fastest join
+
+But in your case:
+10 GB + 20 GB → both large
+👉 Broadcast likely NOT feasible
+
+🔥 Approach 1: Salting (Most Important)
+Used when some keys (like customer_id) are heavily skewed
+from pyspark.sql.functions import rand, floor
+transactions = transactions.withColumn("salt", floor(rand()*10))
+
+Approach 2: Skew Join Optimization (Easy win)
+spark.sql.adaptive.enabled = true
+spark.sql.adaptive.skewJoin.enabled = true
+
+🔥 Approach 3: Repartition before join
+df1 = customers.repartition("customer_id")
+df2 = transactions.repartition("customer_id")
+
+df = df1.join(df2, "customer_id")
+
+🔥 Approach 4: Filter skewed keys separately
+👉 Advanced trick:
+
+Identify skewed keys
+Process separately
+Union results
+
+⚡ Step 4: Optimize Shuffle
+spark.sql.shuffle.partitions = 400-800
+
+👉 Best practical approach:
+
+Enable AQE (auto skew handling)
+Repartition on join key
+If skew exists → use salting
+Tune shuffle partitions
 ```
