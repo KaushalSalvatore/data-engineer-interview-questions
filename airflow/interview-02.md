@@ -36,10 +36,8 @@ Python scripts in Airflow are used to define the logic of operators, DAGs, and p
 Python files and allow for extensive customization and control over your workflows.
 ```
 
-#### Q-7 Can you explain how XComs work in Airflow ?
+#### Q-7 
 ```bash
-XComs, or "Cross-communications", are a mechanism in Airflow that allows tasks to exchange messages or data. They 
-are stored in Airflow's metadata database and can be used to pass information between tasks within the same DAG.
 ```
 
 #### Q-8 What is the purpose of Airflow Variables ?
