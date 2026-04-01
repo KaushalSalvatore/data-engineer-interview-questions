@@ -263,8 +263,7 @@ Database connection
 API availability
 File paths (S3, local, etc.)
 
-🗣️:
-“I verify external dependencies like databases or APIs, since many failures originate there.”
+🗣️: “I verify external dependencies like databases or APIs, since many failures originate there.”
 
 5. Review Retries & Alerts
 Check retry attempts
