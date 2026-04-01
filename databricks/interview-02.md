@@ -388,8 +388,51 @@ CREATE TABLE sales_external (
 LOCATION 's3://my-bucket/sales/';
 ```
 
-#### Q-14
+#### Q-14 how do you implement exception handling in Spark ?
 ```bash
+1. 🧱 Driver-Level Exception Handling
+👉 Used for:
+
+Job orchestration
+Reading configs
+Triggering actions
+
+try:
+    df = spark.read.parquet("path")
+    df.show()
+except Exception as e:
+    print(f"Error occurred: {e}")
+
+✔ Catches errors like:
+
+File not found
+Syntax issues
+Job submission failures
+
+2. ⚙️ Executor-Level Exception Handling (Inside Transformations)
+Spark executes transformations on worker nodes (executors), so errors inside functions must be handled there.
+
+def safe_divide(x):
+    try:
+        return 10 / x
+    except Exception:
+        return None   # or default value
+
+rdd = spark.sparkContext.parallelize([1, 2, 0, 4])
+result = rdd.map(safe_divide).collect()
+
+3. 🚫 Handling Bad Records (Production Approach)
+Option 1: Using dropMalformed / permissive
+
+df = spark.read.option("mode", "PERMISSIVE").json("data.json")
+
+Modes:
+
+PERMISSIVE (default) → keeps bad records
+DROPMALFORMED → drops bad rows
+FAILFAST → fails immediately
+
+4. 🔁 Retry Mechanism (Spark Built-in Fault Tolerance)
 ```
 
 #### Q-15

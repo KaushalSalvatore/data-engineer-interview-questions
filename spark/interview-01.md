@@ -367,7 +367,7 @@ Actions (Trigger Execution)
 Actions trigger Spark to execute the DAG and return results or persist output.”
 ```
 
-#### Q-12 functions in spark coalesce and repartition ?
+#### Q-12 functions in spark coalesce and repartition which is more expensive ?
 ```bash
 repartition and coalesce are used to change the number of partitions in Spark.
 repartition can increase or decrease partitions and always causes a full shuffle, so it’s more expensive.
@@ -378,6 +378,49 @@ writing output.
 
 I use repartition when increasing partitions or when data is skewed and I need uniform distribution.
 I use coalesce when decreasing partitions, especially before writing to files, to avoid creating many small files.
+
+👉 repartition() is more expensive than coalesce() in most cases.
+
+⚡ Core Difference
+
+🔹 repartition()
+Performs a full shuffle
+Redistributes data evenly across partitions
+
+df = df.repartition(10)
+
+✔ Data moves across all executors
+✔ Ensures balanced partitions
+❌ Expensive (network + disk I/O)
+
+--> Why repartition() is More Expensive
+
+Because it involves:
+
+🔁 Shuffle operation
+🌐 Network data transfer between nodes
+💾 Disk spill (if data is large)
+⏳ More execution time
+
+When to Use What
+✅ Use coalesce() (cheap)
+Reducing partitions
+Before writing small output files
+
+✅ Use repartition() (expensive but needed)
+Increasing partitions
+Fixing data skew
+Preparing for joins or aggregations
+
+⚡Real Scenario
+
+Case 1:
+You have 100 partitions → want 5 output files
+👉 Use coalesce(5) ✅
+
+Case 2:
+You have skewed data (some partitions huge)
+👉 Use repartition() ✅
 ```
 
 #### Q-13 how to check SparkData frame code chache ? 
