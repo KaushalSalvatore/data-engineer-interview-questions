@@ -1,13 +1,143 @@
-#### Q-1
+#### Q-1 if i have 5 excutore and my 1 excutore fail then what happed ?
 ```bash
+Apache Spark, if one executor fails, the job does not fail immediately. Spark automatically recovers by re-running 
+the failed tasks on another available executor.
+
+Assume:
+
+5 executors running
+One executor crashes 💥
+
+1. Executor failure is detected
+Driver notices executor is lost
+All tasks running on that executor are marked FAILED
+
+2. Tasks are retried
+👉 Spark will:
+Reassign failed tasks to other executors (remaining 4)
+
+✔ Important:
+Spark works on tasks, not executors
+Only failed tasks are re-run, not the whole job
+
+3. Data is recomputed (Lineage concept)
+👉 If data was lost, Spark uses:
+RDD/DataFrame lineage
+✔ Meaning:
+Spark knows how data was created and can recompute it
+
+4. Shuffle data case (important edge case)
+If executor stored shuffle data:
+That data is lost ❌
+Spark will:
+Re-run previous stage to regenerate shuffle data
+
+🔹 5. Job continues (usually)
+👉 As long as:
+Enough resources are available
+Failures are within retry limit
+✔ Job completes successfully
+
+When will job FAIL?
+
+Spark will fail if:
+Too many retries exceeded
+Multiple executors fail repeatedly
+Critical stage cannot be recomputed
+
+spark.task.maxFailures (default = 4) (Retry Configuration)
+
+👉 Think of a team of 5 workers:
+One worker leaves suddenly
+Manager (driver) redistributes work to others
+Work still gets done, just a bit slower
 ```
 
-#### Q-2
+#### Q-2 i config 5 executor 4 executor running completed and 1 is running from a long time what  would be the reason running long and how to solve that
 ```bash
+Why 1 Executor Runs Longer?
+
+1. Data Skew (Most Common)
+👉 One partition has huge data, others are small
+
+Partition 1 → 1GB
+Partition 2 → 1GB
+Partition 3 → 1GB
+Partition 4 → 50GB  ← problem
+
+2. Uneven Partitioning
+Poor partition strategy
+Not enough partitions
+One executor gets more work
+
+3. Skewed Join
+👉 Happens during joins:
+One key appears too frequently
+
+How to Debug
+👉 “I use Spark UI to identify the root cause.”
+
+Check:
+✅ Stage View
+Look for one task taking much longer
+✅ Task Metrics
+Input size per task
+Shuffle read/write
+✅ Executor Tab
+CPU / memory usage
+
+How to Fix (Important for interview)
+✅ 1. Fix Data Skew
+✅ 2. Repartition Data
+✅ 3. Use Adaptive Query Execution (AQE)
+✅ 4. Increase Parallelism
+✅ 5. Cache Intermediate Data
+✅ 6. Check Join Strategy
+
+
+Reason:
+- Data skew (most common)
+- Uneven partitions
+- Skewed joins
+- Slow node
+
+Fix:
+- Repartition
+- Salting
+- AQE
+- Broadcast join
 ```
 
-#### Q-3
+#### Q-3 mechanism for read and flatten the data in json in spark ? 
 ```bash
+🔹 Step 1: File is split into partitions
+Large JSON file → divided across executors
+Each executor processes a chunk
+
+🔹 Step 2: JSON parsing
+Spark uses an internal JSON parser
+Converts JSON → structured DataFrame
+
+Case 1: Flatten Struct
+df.select("id", "address.city", "address.zip")
+
+🔹 Case 2: Flatten Array (explode)
+Flatten Array (explode)
+from pyspark.sql.functions import explode
+
+df.select("id", explode("phones").alias("phone"))
+
+Case 3: Nested Struct + Array
+df.select(
+    "id",
+    "address.city",
+    explode("phones").alias("phone")
+)
+
+4. Best Practices (important for interview)
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+schema = StructType([...])
+spark.read.schema(schema).json("file.json")
 ```
 
 #### Q-4

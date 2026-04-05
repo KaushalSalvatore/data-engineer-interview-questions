@@ -435,20 +435,175 @@ FAILFAST → fails immediately
 4. 🔁 Retry Mechanism (Spark Built-in Fault Tolerance)
 ```
 
-#### Q-15
+#### Q-15 ETL pipeline is failed and nothing in trigger any error in airflow and CloudWatch and how i debug and what to do next in this situation ? 
 ```bash
+In such cases, the issue is usually not a system failure but a logic or data issue, so I focus on tracing data flow and 
+improving observability to catch silent failures early.
+
+✅ “I trace data across stages, validate assumptions, and add checks to prevent silent failures”
+
+-> Step 1: Verify if it’s really a failure
+“First, I confirm whether the pipeline actually failed or if the issue is downstream.”
+
+Check target tables / warehouse
+Compare expected vs actual data
+
+📌 Real-life example:
+Sales dashboard shows zero revenue → pipeline “looks successful” but data is missing
+
+-> Step 2: Check data at each stage (most important)
+
+“Then I trace the data step-by-step through the pipeline.”
+
+Source → Staging → Transform → Target
+Run queries to validate counts
+
+📌 Example:
+
+Source has 1M rows
+Staging has 1M
+Final table has 0 → issue in transformation step
+
+-> Step 3: Check Airflow DAG behavior
+
+👉 “Even if Airflow shows success, I check task-level behavior.”
+
+Look for:
+
+Skipped tasks
+Short-circuit operators
+Conditional branching
+Incorrect dependencies
+
+📌 Example:
+
+A task marked SUCCESS but actually skipped due to condition
+
+-> Step 4: Check for silent failures (very common)
+
+👉 “Many pipelines fail silently due to logic issues rather than system errors.”
+
+Things to check:
+
+⚠️ Data filtering mistakes
+Wrong WHERE condition
+Join condition removing rows (like your SQL example earlier 😉)
+⚠️ Empty data loads
+Source delivered empty file
+API returned no data
+⚠️ Schema mismatch
+Column type change → data dropped silently
+
+📌 Example:
+
+API returned empty JSON → pipeline ran successfully but loaded nothing
+
+🔍 Step 5: Re-run components manually
+
+👉 “I isolate and rerun individual steps.”
+
+Run SQL manually
+Execute script locally
+Trigger single Airflow task
+
+📌 Example:
+
+Transformation query returns 0 rows → root cause found
 ```
 
-#### Q-16
+#### Q-16 how to build CDC data pipeline in databrivks if we have different source of data one is mongo db and second is sql or other database ?
 ```bash
-```
+To build a CDC pipeline in Databricks for multiple sources like MongoDB and SQL databases, I use a streaming-based 
+architecture with a bronze–silver–gold design, where changes are captured from each source, standardized using Delta 
+Lake, and merged into target tables using CDC logic.
 
-#### Q-17
+Step 1: Capture CDC from sources
+✅ MongoDB
+Use:
+MongoDB Change Streams
+👉 Send changes to:
+Kafka OR directly to cloud storage (JSON logs)
+
+✅ SQL databases (MySQL/Postgres)
+Use:
+Debezium
+👉 Reads:
+binlog / WAL → pushes to Kafka
+
+Step 2: Ingest into Databricks
+df = spark.readStream.format("kafka") \
+    .option("subscribe", "cdc_topic") \
+    .load()
+
+🔹 Step 3: Bronze Layer (Raw Data)
+df.writeStream \
+  .format("delta") \
+  .option("checkpointLocation", "/chk/bronze") \
+  .table("bronze_cdc")
+
+Step 4: Normalize & Transform (Silver Layer)
+👉 Problem:
+MongoDB = nested JSON
+SQL CDC = structured
+👉 Solution:
+Flatten + standardize schema
+
+Step 5: Apply CDC using MERGE (Gold Layer)
+MERGE INTO target_table t
+USING silver_cdc s
+ON t.id = s.id
+WHEN MATCHED AND s.operation = 'DELETE' THEN DELETE
+WHEN MATCHED THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *
+```
+ 
+#### Q-17 read mode and write mode in spark (what is default read and write mode) ? 
 ```bash
+Read Modes 
+1. PERMISSIVE (Default)
+👉 This is the default read mode
+Keeps all records
+Bad records → put in a special column (_corrupt_record)
+Missing fields → set to NULL
+
+spark.read.option("mode", "PERMISSIVE").json("file.json")
+
+👉 Behavior:
+No failure
+Data is not lost
+Errors are captured
+
+2. DROPMALFORMED
+Drops bad records completely
+spark.read.option("mode", "DROPMALFORMED").json("file.json")
+
+3. FAILFAST
+Immediately throws error if bad record found
+spark.read.option("mode", "FAILFAST").json("file.json")
+
+2. Write Mode in Spark
+1. error / errorifexists (Default)
+👉 Default write mode
+Throws error if data already exists
+
+df.write.mode("error").save("path")
+
+2. overwrite
+Replaces existing data
+df.write.mode("overwrite").save("path")
+
+3. append
+Adds new data to existing data
+df.write.mode("append").save("path")
+
+4. ignore
+Does nothing if data exists
+df.write.mode("ignore").save("path")
 ```
 
 #### Q-18
 ```bash
+
 ```
 
 #### Q-19
