@@ -140,12 +140,72 @@ schema = StructType([...])
 spark.read.schema(schema).json("file.json")
 ```
 
-#### Q-4
+#### Q-4 how many number of partitions will be created when we do wide dependency transformation ?
 ```bash
+wide transformations create a shuffle, and the number of partitions in the next stage is not fixed—it depends on 
+the shuffle partition configuration or the transformation used.
+
+Wide transformation = shuffle happens
+Examples:
+groupBy
+join
+reduceByKey
+distinct
+
+Number of partitions = spark.sql.shuffle.partitions
+Default value:
+200
 ```
 
-#### Q-5
+#### Q-5 i have  100 core in machine so how many partitions will be  there ? 
 ```bash
+Cores ≠ Partitions
+Cores → parallel execution
+Partitions → units of data/work
+
+If you have 100 cores
+👉 This means:
+You can run 100 tasks in parallel at a time
+
+But how many partitions?
+👉 It depends on the situation:
+
+✅ Case 1: Wide transformation (like groupBy)
+👉 Default:
+Partitions = 200 (spark.sql.shuffle.partitions)
+
+✅ Case 2: Reading a file
+👉 Depends on:
+File size
+Block size (e.g., HDFS/S3 ~128MB)
+Example:
+1TB file → ~8000 partitions
+
+🔥 Best Practice (Important!)
+👉 Ideal partitions:
+Partitions ≈ 2 to 4 × number of cores
+
+For 100 cores: 👉 Recommended: 200 to 400 partitions
+
+Why not 100 partitions?
+👉 If partitions = 100:
+Each core gets 1 task
+No backup tasks if skew happens
+
+👉 If partitions = 300:
+Better load balancing
+Handles slow tasks better
+
+What if partitions are too low?
+CPUs idle ❌
+Poor performance ❌
+
+⚠️ What if too many partitions?
+Too many small tasks
+Scheduling overhead
+
+Cores define parallelism, while partitions define how work is divided. Ideally, we keep partitions higher than 
+cores to ensure efficient utilization
 ```
 
 #### Q-6
