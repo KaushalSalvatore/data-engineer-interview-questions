@@ -195,26 +195,187 @@ duplicates = set([m for m in messages if messages.count(m) > 1])
 print(duplicates)
 ```
 
-#### Q-19 What is Round-Robin Partitioning in Kafka ?
+#### Q-19 how to manage quality of data in Kafka when data is streaming if there is any issue in data then how to handle it without effecting actual pipeline ?
 ```bash
-When a producer sends messages without a key, Kafka assigns each message to the next partition in sequence, 
-looping back to the first partition after the last one.
+1. Real-time Validation in Consumers
 
-Topic with 3 partitions:
-P0, P1, P2
+In your processing layer (like Apache Spark or Kafka consumers):
 
-Messages without key:
-M1 → P0
-M2 → P1
-M3 → P2
-M4 → P0
-M5 → P1
+Check nulls, data types
+Apply business rules (e.g., amount > 0)
+
+2. Dead Letter Queue (DLQ) — Most Important
+
+Never break the pipeline because of bad data
+
+Invalid records are sent to a separate Kafka topic (DLQ)
+Main pipeline continues processing valid data
+Main Topic → Processing → Valid → Target  
+                      → Invalid → DLQ
+
+✔️ Ensures:
+
+No pipeline failure
+Easy reprocessing later
+
+4. Data Classification Strategy
+
+Good data → continue pipeline
+Bad data → DLQ
+Suspicious data → quarantine topic
+
+5. Idempotent Processing
+Ensure reprocessing DLQ data doesn’t create duplicates
+Use unique keys / upserts
+
+Real-world Flow :-
+Producer → Kafka Topic → Spark Consumer
+                         ↓
+                Validation Layer
+                 ↓           ↓
+            Valid Data     Invalid Data
+               ↓               ↓
+            Snowflake        DLQ Topic
+
+✅ 1. Read from Kafka
+spark = SparkSession.builder.appName("KafkaDLQExample").getOrCreate()
+
+df = spark.readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("subscribe", "input_topic") \
+    .load()
+
+✅ 2. Define Schema & Parse JSON
+schema = StructType() \
+    .add("id", StringType()) \
+    .add("name", StringType()) \
+    .add("amount", IntegerType())
+
+parsed_df = df.selectExpr("CAST(value AS STRING)") \
+    .select(from_json(col("value"), schema).alias("data")) \
+    .select("data.*")
+
+✅ 3. Apply Validation Rules
+valid_df = parsed_df.filter(
+    (col("id").isNotNull()) &
+    (col("amount") > 0)
+)
+
+invalid_df = parsed_df.subtract(valid_df)
+
+✅ 4. Write Valid Data (Example: Console / DB / Snowflake)
+valid_query = valid_df.writeStream \
+    .format("console") \
+    .option("checkpointLocation", "/tmp/check_valid") \
+    .start()
+
+✅ 5. Send Invalid Data to DLQ (Kafka Topic)
+invalid_query = invalid_df.selectExpr("to_json(struct(*)) AS value") \
+    .writeStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("topic", "dlq_topic") \
+    .option("checkpointLocation", "/tmp/check_dlq") \
+    .start()
+
+✅ 6. Start Streaming
+spark.streams.awaitAnyTermination()
+
+Key Points to Explain in Interview
+DLQ topic (dlq_topic) stores bad records
+Checkpointing ensures fault tolerance
+Valid/Invalid split keeps pipeline running
+Can reprocess DLQ later after fixing data
 ```
 
-#### Q-20 when not to use kafka ? 
+#### Q-20 I have data pipeline with Kafka and spark so how I design so I can handle consistency and data failures ? 
 ```bash
-Simple point-to-point messaging
-Small-scale applications
-Request-response systems
-Systems needing strict global ordering
+I would design the Kafka + Spark pipeline using exactly-once or at-least-once semantics, idempotent processing, 
+checkpointing, and dead-letter handling to ensure consistency and handle failures.
+
+1. Message Delivery Semantics
+In Apache Kafka:
+Enable idempotent producers
+Use acks=all for durability
+
+from confluent_kafka import Producer
+
+conf = {
+    'bootstrap.servers': 'localhost:9092',
+    'enable.idempotence': True,
+    'acks': 'all',
+    'retries': 1000000,
+    'max.in.flight.requests.per.connection': 5
+}
+
+producer = Producer(conf)
+
+producer.produce('my_topic', key='key1', value='message1')
+producer.flush()
+
+Idempotent producer = guarantees that messages are written exactly once to Kafka, even if retries happen.
+Problem without idempotence:
+Producer sends message
+Network issue → no acknowledgment received
+Producer retries
+👉 Same message gets written twice (duplicate)
+
+With idempotence enabled:
+Kafka assigns:
+Producer ID (PID)
+Sequence number for each message
+Broker checks:
+If message with same sequence already exists → discard duplicate
+
+acks=all ensures that a message is acknowledged only after all replicas have successfully stored it.
+
+🔹 With acks=all:
+Producer sends message
+Leader writes it
+Followers replicate it
+Only then → acknowledgment sent
+
+✔️ Result:
+Message is durable even if a broker fails
+
+2. Spark Structured Streaming with Checkpointing
+In Apache Spark:
+Enable checkpointing
+Store offsets + state in durable storage (HDFS/S3)
+
+df.writeStream \
+  .option("checkpointLocation", "/path/checkpoint") \
+  .start()
+
+✔️ This ensures:
+
+Recovery from failures
+No data loss
+No reprocessing beyond controlled limits
+
+3. Idempotent Processing (Very Important)
+Design transformations so reprocessing doesn’t create duplicates
+Use:
+Primary keys / deduplication logic
+Merge/upsert instead of insert
+
+4. Handle Data Failures (Bad Records)
+Route invalid data to a Dead Letter Queue (DLQ) in Kafka
+Keep pipeline running instead of failing completely
+
+5. Exactly-Once Sink Writes
+Use transactional writes or:
+Upserts (MERGE) in target systems (like Snowflake)
+Avoid duplicate inserts during retries
+
+7. Backpressure & Scaling
+Enable Spark backpressure
+Scale consumers dynamically to handle spikes
+
+How this ensures consistency:
+Kafka guarantees durable event storage
+Spark checkpointing ensures state recovery
+Idempotency ensures no duplicates
+DLQ ensures bad data doesn’t break pipeline
 ```

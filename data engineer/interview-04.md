@@ -66,8 +66,38 @@ Scenario 4: NameNode failure
 HA (Active/Standby + ZooKeeper)
 ```
 
-#### Q-2
+#### Q-2 I can draw a simple architecture diagram or give a real-world production example (Kafka → Spark → Snowflake).
 ```bash
+        ┌────────────────────┐
+        │   Data Sources     │
+        │ (Apps, APIs, DBs)  │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │      Kafka         │
+        │ (Topics/Partitions)│
+        └─────────┬──────────┘
+                  │
+        (Streaming Consumption)
+                  │
+                  ▼
+        ┌──────────────────────────┐
+        │   Spark Structured       │
+        │       Streaming          │
+        │ - Transformations        │
+        │ - Validation             │
+        │ - Deduplication          │
+        │ - Checkpointing          │
+        └─────────┬────────────────┘
+                  │
+        ┌─────────┴──────────┐
+        │                    │
+        ▼                    ▼
+┌───────────────┐    ┌────────────────┐
+│   DLQ Kafka   │    │   Snowflake    │
+│ (Bad Records) │    │ (Final Tables) │
+└───────────────┘    └────────────────┘
 ```
 
 #### Q-3

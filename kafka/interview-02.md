@@ -17,6 +17,21 @@ number of up-to-date replicas, improving fault tolerance and reliability.
 ```bash
 The partitioning key indicates the destination partition of the message within the producer. A hashing based 
 partitioner determines the partition ID when the key is given.
+
+Round-Robin Partitioning :-
+
+When a producer sends messages without a key, Kafka assigns each message to the next partition in sequence, 
+looping back to the first partition after the last one.
+
+Topic with 3 partitions:
+P0, P1, P2
+
+Messages without key:
+M1 → P0
+M2 → P1
+M3 → P2
+M4 → P0
+M5 → P1
 ```
 
 #### Q-3 When does QueueFullException occur in the producer ?
