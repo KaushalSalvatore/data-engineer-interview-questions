@@ -100,19 +100,19 @@ HA (Active/Standby + ZooKeeper)
 └───────────────┘    └────────────────┘
 ```
 
-#### Q-3
+#### Q-3 Normalization vs Denormalization ? 
 ```bash
 ```
 
-#### Q-4
+#### Q-4 low offset and high offset in kafka  ? 
 ```bash
 ```
 
-#### Q-5
+#### Q-5 Difference between processing time and event time in kafka ? 
 ```bash
 ```
 
-#### Q-6
+#### Q-6 
 ```bash
 ```
 

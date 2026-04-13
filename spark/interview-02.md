@@ -225,6 +225,11 @@ df.filter(df.age > 30).filter(df.salary > 5000)
 
 Catalyst combines filters into one:
 WHERE age > 30 AND salary > 5000
+
+catalyst optimizer can optimized UDF :-
+
+
+
 ```
 
 #### Q-11 How can you perform incremental processing with PySpark ?
