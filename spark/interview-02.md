@@ -226,10 +226,16 @@ df.filter(df.age > 30).filter(df.salary > 5000)
 Catalyst combines filters into one:
 WHERE age > 30 AND salary > 5000
 
-catalyst optimizer can optimized UDF :-
+catalyst optimizer can optimized UDF :- No, the Catalyst Optimizer in Apache Spark cannot effectively optimize UDFs, 
+especially regular (black-box) UDFs.
 
+Avoid UDFs whenever possible — use built-in functions so Catalyst can optimize the query.
 
+Catalyst works on logical plans and understands:
+Built-in Spark SQL functions
+Expressions (like filters, joins, aggregations)
 
+👉 But UDFs are treated as black box
 ```
 
 #### Q-11 How can you perform incremental processing with PySpark ?

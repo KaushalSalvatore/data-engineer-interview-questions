@@ -106,10 +106,47 @@ HA (Active/Standby + ZooKeeper)
 
 #### Q-4 low offset and high offset in kafka  ? 
 ```bash
+In Kafka, low offset and high offset define the range of messages available in a partition, where the low offset 
+is the earliest available message and the high offset is the latest written message.
+
+Partition:
+Offsets → 5, 6, 7, 8, 9
+
+Low Offset  = 5
+High Offset = 9
+Messages 0–4 → already deleted (retention)
+Messages 5–9 → currently available
+
+Consumer Perspective
+Consumer reads between:
+Current offset (where it is now)
+High offset (latest data available)
+
+👉 Lag = High Offset - Consumer Offset
 ```
 
 #### Q-5 Difference between processing time and event time in kafka ? 
 ```bash
+Processing time = time when the system (consumer/Spark) processes the event
+
+Event created at: 10:00 AM  
+Kafka processes it at: 10:05 AM  
+→ Processing Time = 10:05 AM
+
+✅ Characteristics:
+Based on system clock
+Simple and fast
+No handling of delays
+
+Event time = actual time when the event occurred (inside the data itself)
+Event created at: 10:00 AM  
+Arrives late at: 10:05 AM  
+→ Event Time = 10:00 AM
+
+✅ Characteristics:
+Comes from data (timestamp field)
+Handles late-arriving data
+More accurate for analytics
 ```
 
 #### Q-6 
