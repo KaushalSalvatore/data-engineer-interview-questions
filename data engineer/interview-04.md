@@ -149,11 +149,43 @@ Handles late-arriving data
 More accurate for analytics
 ```
 
-#### Q-6 
+#### Q-6 what is factless fact table ? 
 ```bash
+A factless fact table is a type of fact table that does not contain any numeric measures—it only stores relationships 
+or events.
+
+👉 A fact table without metrics (like sales, amount, quantity)
+👉 It only captures “what happened” or “what exists”
+
+Why Use Factless Fact Table?
+Track events (attendance, login, participation)
+Track relationships (student-course, customer-product eligibility)
+
+🧩 Types of Factless Fact Tables
+1. ✅ Event Tracking
+
+👉 Example: Student Attendance
+Student_ID | Date_ID | Class_ID
+--------------------------------
+101        | 20240201 | Math
+102        | 20240201 | Science
+
+✔️ No measure column
+✔️ Each row = event happened
+
+| Feature  | Fact Table            | Factless Fact Table         |
+| -------- | --------------------- | --------------------------- |
+| Measures | Yes (sales, amount)   | ❌ No                        |
+| Purpose  | Quantitative analysis | Event/relationship tracking |
+| Example  | Sales data            | Attendance                  |
+
+           dim_student
+                |
+                |
+dim_date --- attendance_fact --- dim_class
 ```
 
-#### Q-7
+#### Q-7 star vs snowflake schema comparison ? 
 ```bash
 ```
 
