@@ -185,7 +185,7 @@ Student_ID | Date_ID | Class_ID
 dim_date --- attendance_fact --- dim_class
 ```
 
-#### Q-7 star vs snowflake schema comparison ? 
+#### Q-7
 ```bash
 ```
 
