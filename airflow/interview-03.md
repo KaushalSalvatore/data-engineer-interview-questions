@@ -295,13 +295,14 @@ trigger = TriggerDagRunOperator(
 ```
 
 #### Q-17 SequentialExecutor architecture diagram ?
-![image_01](../images/image_05.jpeg)
+![image_01](../images/image-05.jpeg)
+
 
 #### Q-18 LocalExecutor architecture diagram ?
-![image_01](../images/image_06.jpeg)
+![image_02](../images/image-06.jpeg)
 
 #### Q-19 KubernetesExecutor architecture diagram ?
-![image_01](../images/image_07.jpeg)
+![image_03](../images/image-07.jpeg)
 
 #### Q-20 CeleryExecutor  architecture diagram ?
-![image_01](../images/image_08.jpeg)
+![image_04](../images/image-08.jpeg)
