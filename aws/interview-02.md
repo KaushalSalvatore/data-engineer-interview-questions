@@ -540,7 +540,7 @@ Data transformed
 Stored in DynamoDB / RDS / S3
 ```
 
-#### Q-18 How do y\ou configure a Lambda function to write data to a DynamoDB table ?
+#### Q-18 How do you configure a Lambda function to write data to a DynamoDB table ?
 ```bash
 Step 1: Create a DynamoDB Table
 Step 2: Attach IAM Permission to Lambda

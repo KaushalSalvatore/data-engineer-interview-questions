@@ -36,8 +36,41 @@ Python scripts in Airflow are used to define the logic of operators, DAGs, and p
 Python files and allow for extensive customization and control over your workflows.
 ```
 
-#### Q-7 
+#### Q-7 RABC in airflow ? How do you secure your airflow ?
 ```bash
+1. Admin Role
+
+Full access.
+Can:
+✅ Create DAGs✅ Trigger DAGs✅ Delete DAGs✅ Manage users✅ Manage connections
+Example:
+DevOps/Admin team.
+
+2. User Role
+
+Can:
+✅ Trigger DAGs✅ View logs✅ Monitor pipelines
+❌ Cannot manage users.
+Example:
+Data Engineers.
+
+3. Viewer Role
+
+Read-only access.
+Can:
+✅ View DAG status✅ Check logs
+❌ Cannot trigger DAG.
+Example:
+Business/monitoring teams.
+
+
+dag = DAG(
+    "finance_etl",
+    access_control={
+        "Finance": {"can_read", "can_edit"},
+        "Viewer": {"can_read"}
+    }
+)
 ```
 
 #### Q-8 What is the purpose of Airflow Variables ?
