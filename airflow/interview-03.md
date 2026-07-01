@@ -295,7 +295,7 @@ trigger = TriggerDagRunOperator(
 ```
 
 #### Q-17 SequentialExecutor architecture diagram ?
-![image_01](./images/image_04.png)
+![image_01](../images/image_04.png)
 
 #### Q-18 LocalExecutor architecture diagram ?
 ![image_01](./images/image_05.png)

@@ -128,7 +128,8 @@ LocalExecutor runs tasks in parallel on the same machine. It’s good for small 
 
 CeleryExecutor distributes tasks across multiple workers using Celery, making it suitable for medium to large teams. 
 
-KubernetesExecutor runs each task in its own Kubernetes Pod, giving the best scalability and isolation for production environments.
+KubernetesExecutor runs each task in its own Kubernetes Pod, giving the best scalability and isolation for
+production environments.
 ```
 
 #### Q-15 How do you monitor and debug failed DAG runs in production ?
