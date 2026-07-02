@@ -286,8 +286,30 @@ trigger = TriggerDagRunOperator(
 )
 ```
 
-#### Q-15
+#### Q-15 priority queue and normal queue ?
 ```bash
+A normal queue follows FIFO, where the first inserted element is processed first. A priority queue processes elements based on priority rather than insertion order, making it useful for critical task scheduling, emergency systems, and job prioritization.
+
+with DAG(
+    dag_id='priority_example',
+    start_date=datetime(2025, 1, 1),
+    schedule='@daily',
+    catchup=False
+) as dag:
+
+    critical_etl = PythonOperator(
+        task_id='critical_etl',
+        python_callable=critical_task,
+        priority_weight=100
+    )
+
+    dashboard_refresh = PythonOperator(
+        task_id='dashboard_refresh',
+        python_callable=reporting_task,
+        priority_weight=10
+    )
+
+    critical_etl >> dashboard_refresh
 ```
 
 #### Q-16

@@ -147,6 +147,32 @@ operations like filtering, transforming, aggregating, and joining streams.
 Kafka producers and consumers can be configured with serializers and deserializers for keys and values. Common 
 formats include String, Integer, and Avro. For complex objects, custom serializers and deserializers can be 
 implemented.
+
+Application Object
+       |
+       | Serialize
+       v
+Producer
+       |
+       | Bytes
+       v
+Kafka Topic
+       |
+       | Bytes
+       v
+Consumer
+       |
+       | Deserialize
+       v
+Application Object
+
+Kafka brokers only store bytes. Therefore, before sending data to Kafka, the producer must convert the object into a byte array.
+
+The consumer receives the byte array and converts it back into an object.
+
+Why do we need serialization in Kafka?
+
+Because Kafka brokers can only store and transmit byte arrays. Serialization converts application objects into bytes before sending, and deserialization converts bytes back into application objects after receiving.
 ```
 
 #### Q-14 How does Kafka handle message retention across multiple data centers ?

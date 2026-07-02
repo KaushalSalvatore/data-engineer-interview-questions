@@ -339,6 +339,8 @@ Yes, Amazon EMR can run real-time streaming applications using frameworks such a
 Apache Flink, and Apache Storm. These frameworks allow EMR clusters to process continuous streams of data 
 from sources like Kafka or Amazon Kinesis and perform real-time analytics or transformations before storing 
 the results in services such as Amazon S3 or data warehouses.
+
+
 ```
 
 #### Q-15 What are the common use cases of Amazon EMR ?

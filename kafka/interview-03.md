@@ -3,13 +3,20 @@
 Docker-compose up or Docker-compose up -d
 docker-compose down -v
 docker ps
-```
 
-#### Q-2 go to kafka container ?
-```bash
+kafka container
+
 docker exec -it kafka bash 
 cd /opt/kafka/bin
 ls (list of inside folder)
+```
+
+#### Q-2 ordering message in kafka ?
+```bash
+message ordering is guaranteed only within a partition, not across the entire topic.
+
+Ordering is guaranteed only within a partition. Across multiple partitions Kafka does not guarantee 
+global ordering.
 ```
 
 #### Q-3 What is the best way to start the Kafka server ?

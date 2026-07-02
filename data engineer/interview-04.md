@@ -175,7 +175,7 @@ Student_ID | Date_ID | Class_ID
 
 | Feature  | Fact Table            | Factless Fact Table         |
 | -------- | --------------------- | --------------------------- |
-| Measures | Yes (sales, amount)   | ❌ No                        |
+| Measures | Yes (sales, amount)   | ❌ No                       |
 | Purpose  | Quantitative analysis | Event/relationship tracking |
 | Example  | Sales data            | Attendance                  |
 
@@ -185,24 +185,152 @@ Student_ID | Date_ID | Class_ID
 dim_date --- attendance_fact --- dim_class
 ```
 
-#### Q-7
+#### Q-7 how to how do manage schema evaluation as a part of pipeline make a step by step two section point as a snowflake dbt airflow and aws and databricks and azure data engineer ?
 ```bash
+Step 1: Ingest Data
+Receive data from APIs, databases, or streaming sources using AWS services such as Kinesis or S3.
+Land all incoming data in the Bronze (Raw) layer.
+Preserve the original data for replay and auditing.
+
+Step 2: Detect Schema Changes
+Compare the incoming schema with the existing schema stored in the metadata repository (for example, AWS Glue Data Catalog).
+
+Step 3: Validate the Schema
+
+Before loading data:
+
+Check required columns exist.
+Validate data types.
+Verify primary keys and timestamps.
+Ensure mandatory fields are not null.
+
+If validation fails:
+
+Move the file or records to a quarantine location.
+Log the error.
+Notify the data engineering team.
+
+Step 4: Handle Schema Evolution
+
+Follow these rules:
+
+✅ Add new nullable columns automatically.
+✅ Populate missing optional columns with NULL.
+
+Step 5: Load Data into Snowflake
+Load validated data into staging tables.
+Keep staging tables close to the raw schema.
+
+Step 6: Transform Using dbt
+
+Create dbt models:
+
+Staging: Standardize column names and data types.
+Intermediate: Apply business logic.
+Mart: Build reporting-ready tables.
+
+Step 7: Orchestrate with Airflow
+
+Create an Airflow DAG with tasks such as:
+
+Ingest data
+Detect schema changes
+Validate schema
+Load to Snowflake
+Run dbt models
+Execute dbt tests
+Publish curated tables
+Send success or failure notifications
+
+Step 8: Monitor Schema Drift
+
+Continuously monitor:
+
+New columns
+Dropped columns
+Data type changes
+Null percentage
+Row counts
+Data freshness
 ```
 
-#### Q-8
+#### Q-8 database sharding and partitioning ?
 ```bash
+| Feature          | Partitioning             | Sharding                                |
+| ---------------- | ------------------------ | --------------------------------------- |
+| Split Data       | Within the same database | Across multiple databases/servers       |
+| Purpose          | Performance              | Scalability                             |
+| Physical Storage | Same DB server           | Multiple DB servers                     |
+| Transparency     | Usually handled by DB    | Often handled by application/middleware |
+| Complexity       | Lower                    | Higher                                  |
+
+Sharding divides data across multiple database servers.
+Shard 1 → Customers 1-1M
+Shard 2 → Customers 1M-2M
+Shard 3 → Customers 2M-3M	
+
+Partitioning divides a large table into smaller logical partitions within the same database to improve query performance and manageability. Sharding distributes data across multiple database servers to achieve horizontal scalability and handle very large workloads. Partitioning improves performance on a single database, while sharding allows the system to scale beyond the capacity of a single server.
 ```
 
-#### Q-9
+#### Q-9 Spark is an in-memory compute engine then why do we need cache in apache spark ?
 ```bash
+Instead of repeatedly reading data from disk, Spark keeps frequently used data in RAM, where it can be 
+processed much more quickly.
+
+cache() tells Spark to keep the DataFrame in memory so later operations don't need to reread the source.
+
+Example
+
+Suppose you have a 10 GB sales dataset.
+
+Read 10 GB once
+↓
+Store in RAM
+↓
+Filter
+↓
+Group By
+↓
+Join
+↓
+Write output
 ```
 
-#### Q-10
+#### Q-10 Different compression techniques such as snappy, biz2 and LZO. And which one to choose ?
 ```bash
+| Compression     |     Speed | Compression Ratio | CPU Usage |    Splittable | Best Use Case           |
+| --------------- | --------: | ----------------: | --------: | ------------: | ----------------------- |
+| **Snappy**      | Very Fast |            Medium |       Low |           Yes | Fast ETL, analytics     |
+| **Bzip2 (bz2)** |      Slow |              High |      High |           Yes | Maximum storage savings |
+| **LZO**         | Very Fast |        Low–Medium |       Low | Yes (indexed) | Real-time processing    |
+
+snappy(100 GB raw data → ~35–50 GB compressed) 
+Bzip2 (bz2) (100 GB raw data → ~20–30 GB compressed)
+LZO (100 GB raw data → ~45–60 GB compressed)
 ```
 
-#### Q-11
+#### Q-11 How do you ensure the pipeline does not repeat a similar kind of failure ?
 ```bash
+A. Retry Strategy with Backoff
+
+For transient failures like: API timeout Temporary DB issue Network issue
+I configure retries
+
+retries=3,
+retry_delay=timedelta(minutes=5),
+retry_exponential_backoff=True
+
+B. Idempotent Pipeline Design
+
+One of the biggest causes of repeated failures is duplicate processing after reruns.
+
+C. Failure Isolation
+
+When a pipeline fails, I don’t just rerun it. I first identify the root cause using logs and monitoring, 
+then implement preventive fixes. In Airflow, I use retries with backoff, idempotent DAG design, and alerts. 
+In Snowflake, I use transactional loads, MERGE logic, validations, and monitoring through query history. 
+In AWS pipelines, I rely on DLQs, checkpointing, CloudWatch alerts, and autoscaling. The goal is to ensure 
+the same failure becomes non-repeatable rather than repeatedly firefighting it.
 ```
 
 #### Q-12
