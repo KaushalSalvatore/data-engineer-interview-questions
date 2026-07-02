@@ -333,8 +333,50 @@ In AWS pipelines, I rely on DLQs, checkpointing, CloudWatch alerts, and autoscal
 the same failure becomes non-repeatable rather than repeatedly firefighting it.
 ```
 
-#### Q-12
+#### Q-12  tell me when to use delta lake , data warehouse , sql and no sql ?
 ```bash
+:- SQL Database – For Transactional Applications
+
+Use when:
+
+Data has clear relationships.
+ACID transactions are required.
+Data consistency is critical.
+
+:- NoSQL Database – For Flexible and High-Scale Data
+
+Use when:
+
+Schema changes frequently.
+Large-scale applications require horizontal scaling.
+Data is semi-structured or unstructured.
+
+:- Data Warehouse – For Business Reporting
+
+Use when:
+
+Creating dashboards.
+Supporting BI tools.
+Running SQL-based analytics.
+Managing curated business data.
+
+Popular Cloud Data Warehouses
+
+Snowflake
+Google Cloud BigQuery
+Amazon Web Services Redshift
+Microsoft Azure Synapse Analytics
+
+:- Delta Lake – For Data Lakes and Big Data
+
+Cloud Example (AWS)
+
+Kinesis -> Amazon S3-> Databricks (Delta Lake)->Snowflake ->
+
+Cloud Example (Azure)
+
+IoT Devices -> Azure Event Hubs -> Azure Data Lake Storage -> Databricks + Delta Lake -> Silver Tables
+-> Gold Tables
 ```
 
 #### Q-13
