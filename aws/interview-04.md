@@ -223,7 +223,8 @@ Data locations (usually in S3)
 
 #### Q-11 What is a Glue Partition Index, and why is it used ?
 ```bash
-A Glue Partition Index is a feature of the AWS Glue Data Catalog that improves the performance of partition filtering in large partitioned tables.
+A Glue Partition Index is a feature of the AWS Glue Data Catalog that improves the performance of partition 
+filtering in large partitioned tables.
 
 Normally, when a query filters partitions, the Data Catalog:
 Fetches all partition metadata

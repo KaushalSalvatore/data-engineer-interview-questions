@@ -288,7 +288,9 @@ trigger = TriggerDagRunOperator(
 
 #### Q-15 priority queue and normal queue ?
 ```bash
-A normal queue follows FIFO, where the first inserted element is processed first. A priority queue processes elements based on priority rather than insertion order, making it useful for critical task scheduling, emergency systems, and job prioritization.
+A normal queue follows FIFO, where the first inserted element is processed first. A priority queue processes 
+elements based on priority rather than insertion order, making it useful for critical task scheduling, 
+emergency systems, and job prioritization.
 
 with DAG(
     dag_id='priority_example',

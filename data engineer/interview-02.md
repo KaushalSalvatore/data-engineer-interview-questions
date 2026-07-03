@@ -441,7 +441,8 @@ id: int
 name: string
 age: int
 
-Schema Evolution : Schema evolution allows us to modify the table structure, such as adding new columns, without breaking existing data or pipelines.
+Schema Evolution : Schema evolution allows us to modify the table structure, such as adding new columns,
+without breaking existing data or pipelines.
 ```
 
 #### Q-18 i have 8 columns requirement is 12 table so how to do it how pipeline effect explain me how to handle in databricks and snowflake ? 

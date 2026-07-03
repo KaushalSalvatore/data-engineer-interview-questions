@@ -427,15 +427,17 @@ Regulatory compliance
 Debugging pipeline errors
 Monitoring data changes
 
-To implement audit logging in a data pipeline, I create an audit table to store change history. Then I use SQL triggers 
-on target tables to capture INSERT, UPDATE, and DELETE operations. The trigger calls a stored procedure that writes old 
-values, new values, user, and timestamp into the audit table. This ensures every data change in the pipeline is logged automatically.
+To implement audit logging in a data pipeline, I create an audit table to store change history. Then I use SQL 
+triggers on target tables to capture INSERT, UPDATE, and DELETE operations. The trigger calls a stored procedure 
+that writes old values, new values, user, and timestamp into the audit table. This ensures every data change in 
+the pipeline is logged automatically.
 ```
 
 #### Q-15  You have a huge text file, how would you replicate a given row "n" number of times, write a code for this ?
 ```bash
-For a huge text file, I would process it line by line using streaming instead of loading it into memory. When the target 
-row is reached, I would write that row n times to the output file, ensuring the solution works efficiently for very large datasets.
+For a huge text file, I would process it line by line using streaming instead of loading it into memory. When the 
+target row is reached, I would write that row n times to the output file, ensuring the solution works efficiently 
+for very large datasets.
 ```
 
 #### Q-16 How is deployment done in your project ? Explain about development/testing etc. ?

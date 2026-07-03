@@ -89,7 +89,8 @@ Glue Catalog
  ↓
 Athena
 
-The crawler can automatically discover and register new partitions. However, Athena itself is not doing the discovery; the crawler is.
+The crawler can automatically discover and register new partitions. However, Athena itself is not doing the 
+discovery the crawler is.
 ```
 
 #### Q-4 Retention period of data in Kinesis ?
@@ -134,7 +135,8 @@ Kinesis Data Stream
 A Secondary Index in DynamoDB provides an alternate way to query data using attributes other than 
 the table's primary key. DynamoDB supports two types: Global Secondary Indexes (GSIs), which can have 
 different partition and sort keys from the base table, and Local Secondary Indexes (LSIs), which share 
-the same partition key but use a different sort key. Secondary indexes improve query flexibility without requiring full table scans.
+the same partition key but use a different sort key. Secondary indexes improve query flexibility without 
+requiring full table scans.
 
 When designing a DynamoDB table, you first define the Primary Key. However, applications often need to 
 query data in multiple ways. That's where Global Secondary Indexes (GSI) and Local Secondary Indexes (LSI) 
@@ -182,7 +184,11 @@ Email Service - Sends an order confirmation.
 
 #### Q-7 design the pipeline in a such a way that whenever schema change one get notify through the glue service ?
 ```bash
-I would use AWS Glue Crawlers to discover schemas and update the Glue Data Catalog. Event Bridge would monitor Glue table update events and trigger an SNS notification or Lambda function whenever a schema change occurs. The Lambda can compare the previous and current schema versions and send detailed alerts through email, Slack, or Teams. For streaming pipelines, I would use AWS Glue Schema Registry to enforce schema compatibility and notify teams of breaking changes before data is ingested.
+I would use AWS Glue Crawlers to discover schemas and update the Glue Data Catalog. Event Bridge would monitor 
+Glue table update events and trigger an SNS notification or Lambda function whenever a schema change occurs. 
+The Lambda can compare the previous and current schema versions and send detailed alerts through email, Slack, 
+or Teams. For streaming pipelines, I would use AWS Glue Schema Registry to enforce schema compatibility and 
+notify teams of breaking changes before data is ingested.
 
 S3 Landing Zone
        ↓

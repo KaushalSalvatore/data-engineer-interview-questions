@@ -269,7 +269,10 @@ Shard 1 → Customers 1-1M
 Shard 2 → Customers 1M-2M
 Shard 3 → Customers 2M-3M	
 
-Partitioning divides a large table into smaller logical partitions within the same database to improve query performance and manageability. Sharding distributes data across multiple database servers to achieve horizontal scalability and handle very large workloads. Partitioning improves performance on a single database, while sharding allows the system to scale beyond the capacity of a single server.
+Partitioning divides a large table into smaller logical partitions within the same database to improve query 
+performance and manageability. Sharding distributes data across multiple database servers to achieve horizontal 
+scalability and handle very large workloads. Partitioning improves performance on a single database, while 
+sharding allows the system to scale beyond the capacity of a single server.
 ```
 
 #### Q-9 Spark is an in-memory compute engine then why do we need cache in apache spark ?
