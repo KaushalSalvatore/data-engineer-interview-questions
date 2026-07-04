@@ -382,8 +382,53 @@ IoT Devices -> Azure Event Hubs -> Azure Data Lake Storage -> Databricks + Delta
 -> Gold Tables
 ```
 
-#### Q-13
+#### Q-13 expalin serveless and monolith artecutuire and how lambda work ?  
 ```bash
+monolith :-
+
+A monolithic architecture is an application where all components are built and deployed as a single unit.
+
+                Monolithic Application
+      +--------------------------------------+
+      |                                      |
+      |  User Login                          |
+      |  Product Catalog                     |
+      |  Shopping Cart                       |
+      |  Payment                             |
+      |  Order Management                    |
+      |  Notification                        |
+      |                                      |
+      +--------------------------------------+
+                     │
+                     ▼
+                  Database
+
+How it works :- 
+All features run in one application.
+If you change one feature, you typically redeploy the entire application.
+All modules usually share the same database.
+
+serveless :-
+
+In a serverless architecture, you don't manage servers directly. You write small functions, and the cloud provider runs them when events occur.
+
+For AWS, this is commonly done using Amazon Web Services Lambda.
+
+Customer Uploads Image
+          │
+          ▼
+     Amazon S3
+          │
+     (Event Trigger)
+          │
+          ▼
+      AWS Lambda
+          │
+          ▼
+Resize Image
+          │
+          ▼
+Store Processed Image
 ```
 
 #### Q-14

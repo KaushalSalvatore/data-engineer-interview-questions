@@ -207,8 +207,61 @@ SNS
 Email / Slack
 ```
 
-#### Q-8
+#### Q-8  deploy lamdba code with diffrent ways ?  
 ```bash
+Lambda Components
+
+A Lambda function consists of:
+
+Function Code (Python, Java, Node.js, etc.)
+Handler (entry point, e.g., lambda_handler)
+Runtime (Python, Java, .NET, etc.)
+Trigger (S3, API Gateway, Kinesis, EventBridge, etc.)
+Execution Role (IAM) (permissions to access AWS services)
+
+def lambda_handler(event, context):
+    print("Hello AWS Lambda")
+
+    return {
+        "statusCode": 200,
+        "body": "Success"
+    }
+
+Ways to Deploy (Upload) a Lambda Function
+
+1. ZIP File Upload (Most Common)
+
+2. Upload from Amazon S3
+
+3. Container Image (Docker)
+
+4. CI/CD Pipeline
+
+VS Code
+    │
+git push
+    │
+    ▼
+GitHub
+    │
+    ▼
+GitHub Actions
+    │
+    ▼
+Deploy to AWS Lambda
+
+What is a Lambda Layer :- A Lambda Layer is a reusable package of libraries or dependencies that can be shared 
+across multiple Lambda functions.
+
+Lambda Layer
+
+      pandas
+      numpy
+      boto3
+           │
+   ┌───────┼────────┐
+   ▼       ▼        ▼
+Lambda1 Lambda2 Lambda3
 ```
 
 #### Q-9
