@@ -34,6 +34,20 @@ Step Functions (Orchestrator)
         |
         |---- Lambda 3 (Load Data)
 
+-> AWS Step Functions is a serverless workflow orchestration service used to coordinate multiple AWS services into a sequence of tasks. It helps implement ETL pipelines, automate business processes, manage retries, error handling, branching, and parallel execution without writing custom orchestration code.
+
+S3 File Arrival
+      ↓
+Step Function Triggered
+      ↓
+Lambda Validates File
+      ↓
+Glue ETL Job Runs
+      ↓
+Data Loaded to Redshift
+      ↓
+SNS Sends Success Email
+
 Types of Step Functions
 
 Standard Workflows

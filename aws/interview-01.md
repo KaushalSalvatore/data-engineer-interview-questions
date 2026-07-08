@@ -18,7 +18,7 @@ and ensuring reliable monitoring and governance. Cost-performance trade-offs and
 the biggest ongoing challenges.
 ```
 
-#### Q-3 What exactly is Amazon S3 ?
+#### Q-3 What exactly is Amazon S3 and how we can secure the s3 bucket ?
 ```bash
 Amazon S3 is a scalable object storage service used to store and retrieve large volumes of unstructured or 
 structured data. It is highly durable, secure, and commonly used to build data lakes and support analytics 
@@ -29,6 +29,20 @@ Bucket
          └── File (object)
         
 s3://company-data/raw/2026/sales.csv
+
+process to make data s3 bucket square :- 
+
+IAM Policies
+    ↓
+Bucket Policies
+    ↓
+Encryption
+    ↓
+Network Controls
+    ↓
+Monitoring & Auditing
+    ↓
+Data Protection
 ```
 
 #### Q-4 What does Amazon EC2 do ?

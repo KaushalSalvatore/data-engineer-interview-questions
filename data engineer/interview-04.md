@@ -433,10 +433,91 @@ Store Processed Image
 
 #### Q-14 daily my data incoming 80 gb but someday suddenly 100 gb  then how to handle this situation ?
 ```bash
+Scenario :- 
+Daily Input = 80 GB
+Executors = 8
+Executor Memory = 8 GB (Your job finishes in 20 minutes.)
+
+One day, due to a festival, month-end processing, or a data replay, the input becomes: (100 GB)
+
+If you do nothing, you may see:
+
+Longer execution time
+Executor OutOfMemory (OOM) errors
+Increased shuffle spill to disk
+Failed stages due to memory pressure
+
+Option 1: Enable Dynamic Allocation (Recommended)
+
+Yesterday
+80 GB
+↓
+8 Executors
+
+Today
+100 GB
+↓
+Spark requests
+10 Executors
+
+spark.dynamicAllocation.enabled=true
+spark.dynamicAllocation.minExecutors=4
+spark.dynamicAllocation.maxExecutors=20
+
+Option 2: Increase Partitions
+
+80 GB
+↓
+80 Partitions
+↓
+1 GB per partition
+
+100 GB
+↓
+Still 80 Partitions
+↓
+1.25 GB per partition
+
+df = df.repartition(120)
+
+They respond by:
+
+-> Dynamic allocation increases executors from 8 → 12.
+-> Input partitions increase from 80 → 120.
+-> No code changes are required.
+-> Job finishes successfully.
 ```
 
-#### Q-15
+#### Q-15 How do you decide which should go to the Data Warehouse and which should be treated as an external table ?
 ```bash
+Rule of Thumb
+
+Put data in the Data Warehouse when:
+
+It is frequently queried.
+Used in dashboards and reports.
+Requires fast response times.
+Requires joins with other warehouse tables.
+Needs data modeling (star schema, dimensions, facts).
+Business users access it regularly.
+
+Use External Tables when:
+
+Data is very large.
+Accessed infrequently.
+Mostly used for ad-hoc analysis.
+Stored in a data lake (S3, ADLS, OneLake).
+You want to avoid copying data.
+Raw or semi-structured data (JSON, Parquet, CSV).
+
+ad-hoc (Ad-hoc means "for a specific purpose or as needed" rather than being pre-planned or recurring.
+In data engineering and analytics, an ad-hoc query is a query that a user runs to answer a one-time business question.)
+
+SELECT
+    order_date,
+    SUM(sales_amount)
+FROM fact_sales
+GROUP BY order_date;
 ```
 
 #### Q-16
