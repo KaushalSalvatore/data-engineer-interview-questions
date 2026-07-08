@@ -85,6 +85,70 @@ Examples:
 Customer (name, age, city)
 Product (category, brand)
 Date (day, month, year)
+
+Types of Fact Tables
+
+A) Transaction Fact Table
+
+| order_id | customer_id | product_id | sales_amount |
+| -------- | ----------: | ---------: | -----------: |
+| 101      |           1 |        201 |          500 |
+
+B) Periodic Snapshot Fact Table
+
+| date   | account_id | balance |
+| ------ | ---------: | ------: |
+| 01-Jun |        101 |  50,000 |
+
+C) Accumulating Snapshot Fact Table
+
+| order_id | order_date | shipped_date | delivered_date |
+| -------- | ---------- | ------------ | -------------- |
+| 101      | 1-Jun      | 2-Jun        | 5-Jun          |
+
+D) Factless Fact Table
+
+| student_id | class_id | attendance_date |
+| ---------- | -------- | --------------- |
+| 1          | 101      | 10-Jun          |
+
+
+Types of Dimension Tables
+
+1. Dimension Table
+
+| customer_id | customer_name | city      | age |
+| ----------- | ------------- | --------- | --: |
+| 101         | Kaushal       | Ahmedabad |  25 |
+| 102         | Rahul         | Pune      |  30 |
+
+
+2. Role-Playing Dimension
+| date_key | date        | month | year |
+| -------- | ----------- | ----- | ---: |
+| 20260601 | 01-Jun-2026 | Jun   | 2026 |
+
+
+3. Slowly Changing Dimension (SCD)
+
+4. Conformed Dimension
+
+| customer_id | customer_name | city      |
+| ----------- | ------------- | --------- |
+| 101         | Kaushal       | Ahmedabad |
+
+5. Junk Dimension
+
+| order_id | gender | is_active | premium_member |
+| -------- | ------ | --------- | -------------- |
+| 1        | M      | Y         | N              |
+
+
+6. Degenerate Dimension
+
+| invoice_number | customer_id | sales |
+| -------------- | ----------: | ----: |
+| INV101         |           1 |   500 |
 ```
 
 #### Q-5 Design Dimensional modeling for social media ? 

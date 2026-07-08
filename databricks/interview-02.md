@@ -116,6 +116,48 @@ Driver (Brain 🧠)
 Executors (Workers 💪)
    ↓
 Process Data
+
+                Spark Application
+
+             +----------------------+
+             |      Driver          |
+             |----------------------|
+             | SparkContext         |
+             | DAG Scheduler        |
+             | Task Scheduler       |
+             | Collect Result       |
+             +----------+-----------+
+                        |
+          ------------------------------
+          |             |              |
+      Executor 1    Executor 2    Executor 3
+      (4 GB RAM)    (4 GB RAM)    (4 GB RAM)
+          |             |              |
+     Task1 Task2    Task3 Task4    Task5 Task6
+
+Driver Memory : 
+
+-> Creating SparkSession
+-> Reading your code
+-> Creating execution plans (DAG)
+-> Scheduling tasks
+-> Receiving results from executors
+-> Holding objects created in the driver program
+
+spark = SparkSession.builder.getOrCreate()
+
+df = spark.read.csv("sales.csv")
+
+Executor Memory :- 
+
+-> Read partitions
+-> Execute tasks
+-> Store cached data
+-> Perform joins
+-> Perform aggregations
+-> Shuffle data
+
+df.groupBy("country").sum("sales")
 ```
 
 #### Q-5 What is Auto Loader ?
@@ -606,8 +648,156 @@ df.write.mode("ignore").save("path")
 
 ```
 
-#### Q-19
+#### Q-19 executor memory or driver memory explain memory distribution if i have 1 TB data ?
 ```bash
+Sales.csv (E-commerce Sales)
+
+Size = 1 TB
+
+Cluster Size : 
+
+Driver = 8 GB
+
+Executor1 = 16 GB,Executor2 = 16 GB,Executor3 = 16 GB,Executor4 = 16 GB
+
+Step 1 :- Driver creates
+
+df = spark.read.csv("sales.csv")
+
+Driver stores only :- (Location of file,Schema,Execution plan)
+Not the actual 1 TB.
+
+Step 2 :- Spark divides file
+
+Partition 1 = 250 GB
+Partition 2 = 250 GB
+Partition 3 = 250 GB
+Partition 4 = 250 GB
+
+Each executor gets one partition.
+
+Executor1 → Partition1
+Executor2 → Partition2
+Executor3 → Partition3
+Executor4 → Partition4
+
+Step 3 :- You execute
+
+df.filter("country='India'")
+
+Each executor filters its own partition
+
+Executor1
+250 GB
+↓
+10 GB
+
+Same for all executors.
+Driver only receives progress updates.
+
+Step 4 :- You execute
+df.count()
+
+Executors compute local counts.
+
+Executor1
+Count = 25 Million
+
+Executor2
+Count = 27 Million
+
+Executor3
+Count = 24 Million
+
+Executor4
+Count = 26 Million
+
+Executors send only numbers.
+
+Driver receives :- 25M,27M,24M,26M
+
+Driver adds them :- 102 Million
+
+Driver never loads 1 TB.
+
+Example 2: collect() 
+
+step : 1 df.collect()
+
+Executors send all rows back to Driver.
+
+Executor1
+250 GB
+↓
+Driver
+
+Executor2
+250 GB
+↓
+Driver
+
+Executor3
+250 GB
+↓
+Driver
+
+Executor4
+250 GB
+↓
+Driver
+
+Driver now needs
+250 + 250 + 250 + 250 = 1 TB RAM
+
+But Driver has only = 8 GB
+
+Result :- OutOfMemoryError
+
+Example 3: Cache
+df.cache()
+
+Where is data cached?
+Answer:
+Executor memory
+
+| Operation            | Driver Memory                     | Executor Memory |
+| -------------------- | --------------------------------- | --------------- |
+| SparkSession         | ✅ Yes                             | ❌ No            |
+| Execution Plan (DAG) | ✅ Yes                             | ❌ No            |
+| Reading CSV          | Metadata only                     | Actual data     |
+| Filter               | No                                | Yes             |
+| Join                 | No                                | Yes             |
+| Aggregation          | Final result only                 | Yes             |
+| Cache/Persist        | No                                | Yes             |
+| Broadcast Variable   | Creates and sends                 | Stores a copy   |
+| `count()`            | Final count                       | Computes counts |
+| `collect()`          | Receives all data (can cause OOM) | Sends data      |
+| Write Parquet        | Coordinates job                   | Writes files    |
+
+Question: Your Spark job fails with java.lang.OutOfMemoryError: Java heap space on the Driver. Why?
+
+Possible causes:
+
+Using collect() on a large DataFrame.
+Converting a large DataFrame to Pandas with toPandas().
+Storing large Python objects on the driver.
+Returning too much data from executors to the driver.
+
+Fixes:
+
+Avoid collect() on large datasets; use show(), take(n), or write results to storage instead.
+Process data in a distributed way rather than pulling it to the driver.
+Increase driver memory if appropriate:
+
+Question: When should you increase executor memory?
+
+Increase executor memory when executors run out of memory during:
+
+Large joins
+Aggregations (groupBy)
+Sorting
+Caching/persisting large datasets
+Shuffle-intensive operations
 ```
 
 #### Q-20

@@ -431,7 +431,7 @@ Resize Image
 Store Processed Image
 ```
 
-#### Q-14
+#### Q-14 daily my data incoming 80 gb but someday suddenly 100 gb  then how to handle this situation ?
 ```bash
 ```
 
