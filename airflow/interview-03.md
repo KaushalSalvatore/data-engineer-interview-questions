@@ -314,8 +314,24 @@ with DAG(
     critical_etl >> dashboard_refresh
 ```
 
-#### Q-16
+#### Q-16 what is the main difference between aws airflow (mwaa) and open source airflow ?
 ```bash
+Open Source Airflow → You manage everything.
+Amazon Web Services MWAA (Managed Workflows for Apache Airflow) → AWS manages the Airflow infrastructure for you.
+
+Use Open Source Airflow when:
+
+You need full control over Airflow.
+You are running in a multi-cloud or on-premises environment.
+You have a team to manage infrastructure.
+You want extensive customization.
+
+Use AWS MWAA when:
+
+Your workloads are primarily on AWS.
+You want to avoid managing Airflow infrastructure.
+You need quick setup and native integration with AWS services.
+You prefer a managed service for lower operational overhead.
 ```
 
 #### Q-17 SequentialExecutor architecture diagram ?
