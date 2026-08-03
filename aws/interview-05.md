@@ -263,12 +263,84 @@ Lambda Layer
    ▼       ▼        ▼
 Lambda1 Lambda2 Lambda3
 ```
-
-#### Q-9
+ 
+#### Q-9 What is the Underlying Architecture of Amazon Redshift ?
 ```bash
+The main architectural components are:
+
+Client Applications
+Leader Node
+Compute Nodes
+Node Slices
+Managed Storage (for RA3 nodes)
+Amazon S3 (Snapshots and Spectrum)
+Columnar Storage
+Query Optimizer and Execution Engine
+
+                 BI Tools / SQL Client
+         (Power BI, Tableau, JDBC, ODBC)
+                        │
+                        ▼
+                +------------------+
+                |   Leader Node    |
+                |------------------|
+                | SQL Parser       |
+                | Optimizer        |
+                | Query Planner    |
+                | Result Merger    |
+                +------------------+
+                  /      |       \
+                 /       |        \
+                ▼        ▼         ▼
+        +------------+ +------------+ +------------+
+        | Compute 1  | | Compute 2  | | Compute 3  |
+        +------------+ +------------+ +------------+
+        | Slice 1    | | Slice 1    | | Slice 1    |
+        | Slice 2    | | Slice 2    | | Slice 2    |
+        | Slice 3    | | Slice 3    | | Slice 3    |
+        +------------+ +------------+ +------------+
+               │              │              │
+               └──────────────┼──────────────┘
+                              ▼
+                    Columnar Data Storage
+                              │
+               RA3 Managed Storage / Local SSD
+                              │
+               Snapshots & Spectrum → Amazon S3
+
+1. Client Layer
+The client layer includes: Power BI,Tableau,SQL Workbench,DBeaver,JDBC/ODBC applications,Python applications
+(The client sends SQL queries to the Leader Node.)
+
+2. Leader Node
+The Leader Node is the brain of the Redshift cluster. :
+Responsibilities :- Accepts SQL queries,Authenticates users,Parses SQL,Validates SQL syntax,Creates an execution plan
+,Optimizes the query,Distributes work to compute nodes,Collects partial results,Returns the final result to the client
+
+The Leader Node does not store user table data. It manages coordination and query planning.
+
+3. Compute Nodes
+Compute nodes perform the actual data processing.
+Responsibilities :- Store table data,Scan data,Filter rows,Perform joins,Aggregate data,Sort data,Execute SQL operations
+
+If your cluster has 8 compute nodes, all 8 can process data simultaneously.
+
+4. Slices
+Each compute node is divided into Slices.
+A slice is the smallest unit of parallel processing.
+
+5. Massively Parallel Processing (MPP)
+Data is distributed across multiple nodes.
+Queries run on all nodes simultaneously.
+Each node processes its own data.
+The Leader Node combines the results.
+
+6. Data Distribution
+Redshift distributes data across compute nodes using distribution styles:
+EVEN,KEY,ALL,AUTO
 ```
 
-#### Q-10
+#### Q-10 
 ```bash
 ```
 
@@ -308,6 +380,17 @@ Lambda1 Lambda2 Lambda3
 ```bash
 ```
 
-#### Q-20
+#### Q-20 Your company has 500 TB of historical sales data in S3 and 10 TB of current data in Redshift. The business wants reports combining both datasets. What would you do ?
 ```bash
+I would keep the frequently accessed 10 TB of current data inside Redshift for fast query performance. The 500 TB 
+of historical data would remain in Amazon S3 to reduce storage costs. I would create external tables using Redshift 
+Spectrum and query both datasets together in a single SQL statement. I would also store the S3 data in Parquet format 
+and partition it by date to improve query performance and minimize the amount of data scanned.
+
+Use Spectrum when:
+Data is very large (tens or hundreds of terabytes).
+Historical data is accessed occasionally.
+You want to reduce Redshift storage costs.
+Multiple analytics services need access to the same S3 data.
+You want to build a data lake architecture.
 ```

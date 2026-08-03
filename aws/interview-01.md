@@ -446,6 +446,8 @@ Amazon Redshift can ingest data from multiple sources including Amazon S3 files 
 and Parquet using the COPY command. It can load from relational databases such as RDS and on-prem systems 
 using AWS DMS or ETL tools. It also supports streaming ingestion from Kinesis and Kafka. Additionally, Redshift 
 Spectrum allows querying data directly from S3 data lakes without loading it into the cluster.
+
+
 ```
 
 #### Q-18 How does Amazon Redshift handle data compression and distribution ?
