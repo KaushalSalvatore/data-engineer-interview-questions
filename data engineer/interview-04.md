@@ -520,16 +520,28 @@ FROM fact_sales
 GROUP BY order_date;
 ```
 
-#### Q-16
+#### Q-16 My file is compressed with Snappy in S3 and its size is 3 GB. How many partitions will Spark create ? 
 ```bash
+It depends on the file format. If it's a Snappy-compressed Parquet file, Spark can split it and, with the default spark.sql.files.maxPartitionBytes of 128 MB, 
+it will create approximately 24 partitions (3072 MB ÷ 128 MB).
 ```
 
-#### Q-17
+#### Q-17 What happens if the timestamp or watermark value is incorrect ?
 ```bash
+If the timestamp or watermark value is incorrect, the pipeline may process duplicate records, miss valid records, process data out of order, or incorrectly discard 
+late-arriving events. The impact depends on whether the timestamp is used for incremental loading or event-time processing.
 ```
 
-#### Q-18
+#### Q-18 How did you handle failures or recovery scenarios in the pipeline ?
 ```bash
+1. Orchestration and Retries (Used Apache Airflow to orchestrate end-to-end workflows.)
+2. Checkpointing in Streaming Pipelines (For Databricks Structured Streaming, enabled checkpointing to store offsets and state information.)
+3. Incremental Processing with Watermarks (Used watermark columns such as last_updated_timestamp for incremental data loads.)
+4. Idempotent Data Loading (Used MERGE (UPSERT) operations in Snowflake instead of simple INSERT statements.)
+5. Error Logging and Monitoring (Monitored pipeline execution using Airflow logs, Databricks job logs, and Snowflake query history.)
+6. Data Validation (Performed schema validation, null checks, duplicate detection, and record count validation before loading data into target tables.)
+7. Transaction Management (Ensured that target tables were updated only after all transformations completed successfully.)
+8. Recovery Strategy (After resolving the root cause, I restarted only the failed Airflow task or Databricks job.)
 ```
 
 #### Q-19

@@ -32,6 +32,56 @@ M2 → P1
 M3 → P2
 M4 → P0
 M5 → P1
+
+how to decide number of partition :-
+
+1. Throughput (Messages per Second)
+
+Number of Partitions =
+Total Expected Throughput /
+Throughput Per Partition
+
+Example
+
+Suppose:
+
+Total incoming messages = 100,000 messages/sec
+One partition can handle = 10,000 messages/sec
+Partitions = 100,000 / 10,000 = 10
+
+2. Number of Consumers
+
+Topic
+----------------
+Partition-0
+Partition-1
+Partition-2
+Partition-3
+
+Consumers (Each consumer reads one partition.)
+
+if you have 8 Consumers Only 4 consumers are active because there are only 4 partitions.
+
+Maximum parallelism = Number of partitions
+
+Real-World Example
+
+Suppose you're designing an order processing system.
+
+Requirements:
+
+1 million orders/day
+Peak traffic = 50,000 orders/sec
+One partition can process about 5,000 orders/sec
+Partitions = 50,000 / 5,000 = 10
+
+You expect traffic to double next year.
+
+So instead of 10 partitions, create:
+
+20 Partitions
+
+Now you can scale up to 20 consumers if needed.
 ```
 
 #### Q-3 When does QueueFullException occur in the producer ?
@@ -61,6 +111,31 @@ Acknowledgments
 ```bash
 Reads in Kafka lag behind Writes as there is always some delay between writing and consuming the message. This 
 delta between the consuming offset and the latest offset is called consumer lag.
+
+Consumer lag tells you how far behind a consumer is in reading messages from Kafka.
+
+Suppose a Kafka topic has one partition.
+
+Partition-0
+
+Offset:
+0   1   2   3   4   5   6   7   8   9   10
+|---|---|---|---|---|---|---|---|---|----|
+
+The producer has written messages up to offset 10.
+
+The consumer has processed messages only up to offset 7.
+
+Latest Offset (LEO)      = 10
+Consumer Offset (Commit) = 7
+
+Consumer Lag = 10 - 7 = 3
+
+The consumer still needs to process messages at offsets 8, 9, and 10.
+
+Formula :-
+
+Consumer Lag = Latest Offset - Consumer Committed Offset
 ```
 
 #### Q-7 What is Kafka producer Acknowledgement ?

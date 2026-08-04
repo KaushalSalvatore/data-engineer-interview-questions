@@ -208,8 +208,11 @@ Cores define parallelism, while partitions define how work is divided. Ideally, 
 cores to ensure efficient utilization
 ```
 
-#### Q-6
+#### Q-6 stateless and staefull stream processing in databricks ? 
 ```bash
+Stateless stream processing processes each event independently without remembering previous events. Operations such as filter, select, withColumn, and data transformations are stateless because the output depends only on the current record. 
+
+Stateful stream processing maintains information across micro-batches, so the output depends on both current and past events. Examples include aggregations (groupBy), windowed aggregations, stream-stream joins, session windows, and duplicate removal with watermarks.
 ```
 
 #### Q-7
