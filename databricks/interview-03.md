@@ -215,8 +215,23 @@ Stateless stream processing processes each event independently without rememberi
 Stateful stream processing maintains information across micro-batches, so the output depends on both current and past events. Examples include aggregations (groupBy), windowed aggregations, stream-stream joins, session windows, and duplicate removal with watermarks.
 ```
 
-#### Q-7
+#### Q-7 What is Liquid Clustering ?
 ```bash
+Liquid Clustering is a Delta Lake feature that organizes data inside files based on one or more frequently filtered columns without creating physical partitions.
+
+customer_id=1001/
+customer_id=1002/
+
+Liquid Clustering keeps the data in optimized files where similar values are grouped together.
+Spark can skip many files using metadata, reducing the amount of data read.
+
+| Partitioning                              | Liquid Clustering                                          |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| Creates physical folders                  | Does not create folders                                    |
+| Best for low-cardinality columns          | Best for high-cardinality columns                          |
+| Manual partition selection                | Automatically organizes data                               |
+| Too many partitions can hurt performance  | Avoids millions of small partitions                        |
+| Commonly used for `date`, `year`, `month` | Commonly used for `customer_id`, `product_id`, `device_id` |
 ```
 
 #### Q-8

@@ -28,6 +28,16 @@ Operations That Commonly Cause Spill
 2. Sort
 3. Join
 4. Aggregation
+
+| Cause                      | Why It Spills                               | Solution                                              |
+| -------------------------- | ------------------------------------------- | ----------------------------------------------------- |
+| Large `groupBy()`          | Shuffle data doesn't fit in memory          | Increase partitions, filter early, tune memory        |
+| Large `join()`             | Shuffle join creates huge intermediate data | Use broadcast join, optimize join order               |
+| `orderBy()`                | Global sort requires shuffle                | Avoid unnecessary sorts, use `sortWithinPartitions()` |
+| Data skew                  | One partition becomes too large             | Salting, AQE, repartitioning                          |
+| Too little executor memory | Executors can't hold intermediate data      | Increase executor memory                              |
+| Too few partitions         | Each partition becomes very large           | Increase `spark.sql.shuffle.partitions`               |
+| Excessive caching          | Memory is consumed by cached data           | Cache selectively and unpersist when done             |
 ```
 
 #### Q-2 tumbling window and sliding window ? 
