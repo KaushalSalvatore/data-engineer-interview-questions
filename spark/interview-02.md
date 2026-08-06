@@ -431,6 +431,9 @@ result = large_df.join(
     "country_id",
     "left"
 )
+
+By default,  only 10 MB of data can be broadcasted.
+spark.sql.autoBroadcastJoinThreshold can be increased up to 8GB
 ```
 
 #### Q-19 collect_list() and collect_set() ? 

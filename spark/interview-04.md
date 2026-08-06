@@ -79,8 +79,13 @@ How many orders were placed every 5 minutes ? (Tumbling Window)
 How many transactions occurred in the last 10 minutes, updated every minute? (Sliding Window) 
 ```
 
-#### Q-3
+#### Q-3 If you perform five actions in Spark, how many DAGs are created?
 ```bash
+Normally, five actions create five separate Spark jobs, and each job has its own DAG. If the actions use the same 
+DataFrame without caching, 
+Spark recomputes the transformations for every action. If the DataFrame is cached or persisted, Spark still 
+creates five DAGs, but after the first action 
+the later jobs reuse the cached data instead of recomputing the lineage.
 ```
 
 #### Q-4

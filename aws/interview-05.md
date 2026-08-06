@@ -340,8 +340,15 @@ Redshift distributes data across compute nodes using distribution styles:
 EVEN,KEY,ALL,AUTO
 ```
 
-#### Q-10 
+#### Q-10 whats is EBS vs s3  ? 
 ```bash
+EBS = Disk attached to one EC2 machine
+S3 = Cloud storage bucket accessible from anywhere
+
+Suppose you launch an EC2 instance. You install (Python Spark Airflow) 
+are these installed? On the EBS volume.
+
+Think of EBS as the hard disk (SSD/HDD) attached to your EC2 virtual machine. It behaves just like your laptop's C: drive.
 ```
 
 #### Q-11

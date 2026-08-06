@@ -409,7 +409,7 @@ Just define transformations
 Everything else is handled automatically
 ```
 
-#### Q-11 What is the?
+#### Q-11 What is the Photon ?
 ```bash
 Photon is a vectorized query engine in Databricks that accelerates SQL and Spark workloads by using a 
 C++ execution layer, improving performance and reducing cost.
