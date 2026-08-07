@@ -270,8 +270,31 @@ Spark can skip many files using metadata, reducing the amount of data read.
 ```bash
 ```
 
-#### Q-17
+#### Q-17 how to get data from API and store in dataframe ?
 ```bash
+example 1 :-
+
+import requests
+response = requests.get("https://api.company.com/employees")
+data = response.json()
+df = spark.createDataFrame(data)
+df.write.format("delta") \
+    .mode("overwrite") \
+    .save("/mnt/delta/employees")
+
+example 2 :-
+
+import requests
+from pyspark.sql.types import *
+url = "https://api.company.com/employees"
+response = requests.get(url)
+data = response.json()
+schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("name", StringType(), True),
+    StructField("salary", IntegerType(), True)
+])
+df = spark.createDataFrame(data, schema)
 ```
 
 #### Q-18 A team has a Databricks job that needs frequent joins among a large fact table and many dimension tables. How will they optimize the join operations for better performance ?
