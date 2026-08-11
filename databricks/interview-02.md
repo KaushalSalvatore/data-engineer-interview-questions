@@ -170,6 +170,27 @@ Cloud Storage → Auto Loader → Spark Processing → Delta Table
 Purpose of Auto Loader : 📥 Automatically detect and load new files only (no reprocessing)
 
 Auto Loader is preferred for building reliable Bronze layer ingestion pipelines in Medallion architecture.
+
+from pyspark.sql import functions as F
+
+source_path = "s3://company-data/sales/"
+checkpoint_path = "s3://company-checkpoints/sales_bronze/"
+target_table = "bronze.sales"
+
+df = (
+    spark.readStream
+        .format("cloudFiles")
+        .option("cloudFiles.format", "parquet")
+        .load(source_path)
+)
+
+(
+    df.writeStream
+      .format("delta")
+      .option("checkpointLocation", checkpoint_path)
+      .outputMode("append")
+      .toTable(target_table)
+)
 ```
 
 #### Q-6 How do you manage cluster configurations in Databricks ?
