@@ -243,7 +243,7 @@ How to Handle Backfill Safely
 kafka-consumer-groups --reset-offsets
 ```
 
-#### Q-8 How would you handle schema evolution in a data lake (e.g., a new column gets added in incoming JSON files) ?
+#### Q-8 How would you handle schema evolution in a data lake (e.g. a new column gets added in incoming JSON files) ?
 ```bash
 You have JSON data landing in a data lake (e.g., Amazon S3):
 Old :-

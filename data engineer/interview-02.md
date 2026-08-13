@@ -114,10 +114,7 @@ We:Load only changed rows
 from delta.tables import DeltaTable
 deltaTable = DeltaTable.forPath(spark, "/mnt/delta/orders")
 (deltaTable.alias("target")
- .merge(
-     sourceDF.alias("source"),
-     "target.id = source.id"
- )
+ .merge(sourceDF.alias("source"),"target.id = source.id")
  .whenMatchedUpdateAll()
  .whenNotMatchedInsertAll()
  .execute())
