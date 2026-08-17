@@ -544,8 +544,40 @@ late-arriving events. The impact depends on whether the timestamp is used for in
 8. Recovery Strategy (After resolving the root cause, I restarted only the failed Airflow task or Databricks job.)
 ```
 
-#### Q-19
+#### Q-19 write a stored procedure when we have to use sql stored procedure and python stored procedure ?
 ```bash
+1. When to use SQL Stored Procedure
+
+Use a SQL stored procedure when the task is mostly:
+
+INSERT, UPDATE, DELETE, MERGE
+SQL transformations
+Calling multiple SQL statements
+Transaction handling
+Simple loops/conditions
+Data validation using SQL
+
+I would use a SQL stored procedure when the business logic is primarily SQL-based. For example, in a retail project, 
+I can create a procedure that performs MERGE from the staging sales table into the fact table, handles validations 
+and updates, and returns the load status.
+
+2. When to use Python Stored Procedure
+
+Complex loops
+Complex string manipulation
+JSON processing
+Calling Python libraries
+Dynamic logic
+Complex error handling
+Building dynamic SQL
+More complicated algorithms
+
+SQL procedure = Data manipulation
+"If my logic is mainly SQL statements like MERGE, INSERT, UPDATE and DELETE, I prefer SQL stored procedures."
+
+Python procedure = Programming logic
+"If my logic requires complex programming, dynamic processing, JSON manipulation, complex validations or Python 
+functionality, I prefer Python stored procedures."
 ```
 
 #### Q-20
