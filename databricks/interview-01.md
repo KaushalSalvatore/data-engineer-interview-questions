@@ -5,7 +5,7 @@ Unity Catalog is the central governance layer inside Databricks.
 It manages:
 🔐 Data access control
 📊 Metadata (tables, schemas, catalogs)
-🧬 Data lineage
+🧬 Data lineage (adls -> Bronze-> Silver-> Gold->Dashboard)
 📜 Audit logs
 🌍 Cross-workspace sharing
 
@@ -411,8 +411,7 @@ Everything else is handled automatically
 
 #### Q-11 What is the Photon ?
 ```bash
-Photon is a vectorized query engine in Databricks that accelerates SQL and Spark workloads by using a 
-C++ execution layer, improving performance and reducing cost.
+Photon is Databricks' native high-performance query execution engine. It is designed to accelerate SQL and DataFrame workloads by using a vectorized, columnar execution engine implemented in native C++ instead of relying only on the JVM-based Spark execution engine. improving performance and reducing cost.
 
 1. Faster Performance
 Uses vectorized execution (processes data in batches instead of row-by-row)
@@ -425,11 +424,15 @@ Apache Spark
 Normal Spark = Reading one line at a time 📄
 Photon = Reading entire pages at once 📚
 
-Enable Photon
-When creating a SQL warehouse or cluster:
-Turn ON Photon
-
 You write normal SQL queries, and Photon automatically accelerates them.
+normal execution :-
+Normal Spark execution -> JVM-based execution-> Process data -> ->
+     
+with photo execution :- 
+Spark SQL / DataFrame -> Catalyst Optimizer-> Photon Execution Engine-> Vectorized / columnar processing->Faster execution
+
+How do you enable Photon?
+Compute -> Create/Edit Compute ->Performance -> Use Photon Acceleration
 ```
 
 #### Q-12 What is Lakehouse Architecture in Databricks and why is it important ?

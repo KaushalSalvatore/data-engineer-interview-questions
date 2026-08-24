@@ -666,7 +666,19 @@ df.write.mode("ignore").save("path")
 
 #### Q-18 Avro ,orc and Parque file format  difference ? 
 ```bash
+Avro     → Row-based   → Streaming / Kafka / data exchange
+Parquet  → Column-based → Analytics / Spark / Data Lake
+ORC      → Column-based → Analytics / Hive / large-scale queries
 
+delta table = Parquet + Delta transaction log = Delta table
+
+                 Delta Lake
+                     |
+             Transaction Layer
+                     |
+          ┌──────────┴──────────┐
+          ↓                     ↓
+     Parquet files         _delta_log
 ```
 
 #### Q-19 executor memory or driver memory explain memory distribution if i have 1 TB data ?
