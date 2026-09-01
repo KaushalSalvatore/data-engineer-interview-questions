@@ -234,8 +234,78 @@ Spark can skip many files using metadata, reducing the amount of data read.
 | Commonly used for `date`, `year`, `month` | Commonly used for `customer_id`, `product_id`, `device_id` |
 ```
 
-#### Q-8
+#### Q-8 What do you mean by a metadata-driven pipeline? Can you explain with an Azure Data Factory and Databricks example ? 
 ```bash
+Instead of hardcoding every table/file/pipeline rule, we store the configuration in metadata tables, and one generic pipeline reads that metadata and decides what to process.
+
+1. Traditional pipeline
+Suppose you have 100 tables:
+
+SQL Table 1 → ADF → ADLS → Databricks
+SQL Table 2 → ADF → ADLS → Databricks
+SQL Table 3 → ADF → ADLS → Databricks
+...
+SQL Table 100 → ADF → ADLS → Databricks
+You might create 100 pipelines or lots of hardcoded activities.
+
+2. Metadata-driven approach
+
+pipeline_metadata
+--------------------------------------------------------
+source_table | target_table | load_type   | watermark
+--------------------------------------------------------
+customers    | customers    | FULL        | NULL
+orders       | orders       | INCREMENTAL | updated_at
+products     | products     | INCREMENTAL | updated_at
+payments     | payments     | INCREMENTAL | modified_at
+
+one generic pipeline :-
+
+Metadata Table ->  ADF -> Read configuration -> tables (orders , products , customers) -> ADLS -> Databricks
+
+If tomorrow you add transactions you can often add a metadata row rather than building an entirely new pipeline.
+
+Azure SQL -> Metadata Table -> ADF -> Lookup Activity -> ForEach / Parameters -> ADLS Gen2 -> 
+
+Databricks (Bronze , Silver , Gold) -> Synapse -> Power BI
+
+What would metadata contain ?
+
+CREATE TABLE pipeline_metadata (
+    pipeline_id        INT,
+    source_system      VARCHAR,
+    source_schema      VARCHAR,
+    source_table       VARCHAR,
+    target_path        VARCHAR,
+    target_table       VARCHAR,
+    load_type          VARCHAR,
+    watermark_column   VARCHAR,
+    primary_key        VARCHAR,
+    is_active          BOOLEAN
+);
+
+Step 1
+How ADF uses metadata ->
+SELECT *
+FROM pipeline_metadata
+WHERE is_active = true;
+It gets: customers orders payments products
+
+Step 2
+ADF uses a ForEach.
+ForEach table
+     │
+     ├── customers
+     ├── orders
+     ├── payments
+     └── products
+
+Step 3 :-
+ADF passes parameters to Databricks.
+source_table = orders
+load_type = INCREMENTAL
+watermark_column = updated_at
+target_path = /bronze/orders/
 ```
 
 #### Q-9
