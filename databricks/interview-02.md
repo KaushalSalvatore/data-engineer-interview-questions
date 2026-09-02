@@ -833,6 +833,6 @@ Caching/persisting large datasets
 Shuffle-intensive operations
 ```
 
-#### Q-20
+#### Q-20 Explain the concept of Delta Tables and time travel in Databricks ?
 ```bash
 ```

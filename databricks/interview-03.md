@@ -308,7 +308,7 @@ watermark_column = updated_at
 target_path = /bronze/orders/
 ```
 
-#### Q-9
+#### Q-9 How do you monitor and troubleshoot failed jobs in Azure Databricks ?
 ```bash
 ```
 
