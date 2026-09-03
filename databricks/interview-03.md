@@ -155,6 +155,10 @@ distinct
 Number of partitions = spark.sql.shuffle.partitions
 Default value:
 200
+
+No. 200 is the default value of spark.sql.shuffle.partitions, but the actual runtime partitioning can be affected 
+by Adaptive Query Execution. AQE can coalesce small shuffle partitions and optimize the number of partitions based on 
+the actual data.
 ```
 
 #### Q-5 i have  100 core in machine so how many partitions will be  there ? 
@@ -310,6 +314,54 @@ target_path = /bronze/orders/
 
 #### Q-9 How do you monitor and troubleshoot failed jobs in Azure Databricks ?
 ```bash
+First, I check the Databricks Jobs/Workflows page to identify whether the failure is at the job, task, or 
+cluster level.
+
+Second, I check the driver and executor logs to identify the actual exception. For example, whether it's an 
+OutOfMemoryError, schema mismatch, permission issue, missing file, or Spark shuffle failure.
+
+Third, I use the Spark UI to analyze failed stages. I specifically look for data skew, excessive shuffle, long-running tasks, 
+spill to disk, and executor failures.
+
+Fourth, I check the input data and upstream pipeline. For example, if ADF is responsible for loading files into ADLS, I verify 
+whether the expected files arrived and whether the schema changed.
+
+Finally, after identifying the root cause, I fix the issue, rerun only the failed task or appropriate job, and monitor the 
+next execution. For production, I also configure retries, alerts, logging, and job dependencies so failures are detected 
+automatically.
+
+1. Check Databricks Job status
+          ↓
+2. Identify failed task
+          ↓
+3. Check driver/executor logs
+          ↓
+4. Check Spark UI
+          ↓
+5. Validate input files/schema
+          ↓
+6. Check ADLS/Unity Catalog permissions
+          ↓
+7. Identify root cause
+          ↓
+8. Fix + rerun
+          ↓
+9. Monitor successful completion
+
+Common failures I would check :-
+
+| Error                  | What I investigate                                  |
+| ---------------------- | --------------------------------------------------- |
+| `OutOfMemoryError`     | Data volume, partitioning, caching, executor memory |
+| `FetchFailedException` | Shuffle, executor failure, network/resource issues  |
+| Data skew              | Spark UI, uneven partition sizes                    |
+| Schema mismatch        | Source schema vs Delta table schema                 |
+| File not found         | ADLS path, upstream ADF pipeline                    |
+| Permission denied      | Unity Catalog/storage permissions                   |
+| Job timeout            | Long stages, inefficient joins, excessive shuffle   |
+| Cluster terminated     | Driver/executor logs, cluster configuration         |
+| Concurrent update      | Multiple jobs writing to same Delta table           |
+| Bad records            | Data-quality checks and source data                 |
 ```
 
 #### Q-10

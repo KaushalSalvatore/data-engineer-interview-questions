@@ -574,7 +574,7 @@ Trigger single Airflow task
 Transformation query returns 0 rows → root cause found
 ```
 
-#### Q-16 how to build CDC data pipeline in databrivks if we have different source of data one is mongo db and second is sql or other database ?
+#### Q-16 how to build CDC data pipeline in databricks if we have different source of data one is mongo db and second is sql or other database ?
 ```bash
 To build a CDC pipeline in Databricks for multiple sources like MongoDB and SQL databases, I use a streaming-based 
 architecture with a bronze–silver–gold design, where changes are captured from each source, standardized using Delta 
@@ -835,4 +835,41 @@ Shuffle-intensive operations
 
 #### Q-20 Explain the concept of Delta Tables and time travel in Databricks ?
 ```bash
+Delta different from Parquet : Parquet is primarily a columnar file format.
+Delta Lake uses Parquet files for the actual data, but maintains a transaction log (_delta_log) that records 
+changes to the table.
+
+df.write \
+  .format("delta") \
+  .mode("append") \
+  .save("/mnt/datalake/silver/customer")
+
+Time travel allows me to access an older version of a Delta table. Every successful transaction creates a 
+new table version, so I can query or restore historical versions of the data.
+
+** Don't say :- Delta stores all historical data forever.
+
+Deltas historical versions depend on the underlying files and transaction-log retention. Old data files 
+can eventually be removed using VACUUM.
+
+VACUUM customer RETAIN 168 HOURS
+
+In my projects, I use Delta Lake as the storage layer for Bronze, Silver, and Gold data. Delta is built on Parquet 
+but adds a transaction log, which provides ACID transactions and enables features like MERGE, UPDATE, DELETE, schema 
+enforcement, schema evolution and time travel.
+
+when I receive daily CDC data from Azure SQL through ADF into ADLS, I process it using Databricks and store the Silver 
+layer as a Delta table. I use MERGE to handle inserts and updates instead of doing a full reload.
+
+One useful feature is time travel. Every successful Delta transaction creates a new table version. If a bad pipeline 
+accidentally updates customer records, I can use DESCRIBE HISTORY to identify the problematic version and query the 
+previous version using VERSION AS OF or TIMESTAMP AS OF.
+
+For production, I also manage retention carefully because VACUUM removes old files and can limit how far back I can time travel. 
+So Delta gives us both reliable transactional processing and historical recovery capabilities on our data lake.
+
+By default, deleted data files are retained for around 7 days and transaction logs around 30 days.
+
+delta.deletedFileRetentionDuration = 'interval 7 days'
+delta.logRetentionDuration = 'interval 30 days'
 ```
