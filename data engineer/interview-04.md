@@ -580,6 +580,6 @@ Python procedure = Programming logic
 functionality, I prefer Python stored procedures."
 ```
 
-#### Q-20
+#### Q-20  Why is over-partitioning a Delta table dangerous ?
 ```bash
 ```

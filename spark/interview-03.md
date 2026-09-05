@@ -552,7 +552,7 @@ df = spark.read.csv(
 filtered_df = df.filter(col("amount") > 1000)
 # 4️⃣ Aggregate Data (Total sales per country)
 agg_df = filtered_df.groupBy("country") \
-    .agg(_sum("amount").alias("total_sales"))
+    .agg(sum("amount").alias("total_sales"))
 # 5️⃣ Write Output
 agg_df.write.mode("overwrite").parquet("output/total_sales_by_country")
 # 6️⃣ Stop Spark Session

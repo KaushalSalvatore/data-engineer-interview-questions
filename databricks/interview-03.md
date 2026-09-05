@@ -364,27 +364,27 @@ Common failures I would check :-
 | Bad records            | Data-quality checks and source data                 |
 ```
 
-#### Q-10
+#### Q-10 Two jobs simultaneously update the same Delta table. What happens ?
 ```bash
 ```
 
-#### Q-11
+#### Q-11 Compare watermark, CDC and CDF ?
 ```bash
 ```
 
-#### Q-12
+#### Q-12 A CDC pipeline was down for 8 hours. How do you recover ?
 ```bash
 ```
 
-#### Q-13
+#### Q-13 Explain OPTIMIZE vs VACUUM vs clustering ?
 ```bash
 ```
 
-#### Q-14
+#### Q-14 Explain managed tables vs external tables in Unity Catalog ? 
 ```bash
 ```
 
-#### Q-15
+#### Q-15 Design an end-to-end production CDC architecture ? 
 ```bash
 ```
 
