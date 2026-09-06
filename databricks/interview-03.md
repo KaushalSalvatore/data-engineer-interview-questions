@@ -386,10 +386,21 @@ Common failures I would check :-
 
 #### Q-15 Design an end-to-end production CDC architecture ? 
 ```bash
+
 ```
 
-#### Q-16
+#### Q-16 You have 5 TB data in ADLS and your Databricks job takes 3 hours. How will you optimize it?
 ```bash
+Partition pruning
+Column pruning
+Parquet/Delta
+Small files
+Shuffle
+Data skew
+Broadcast join
+Caching only when required
+Cluster sizing
+Photon where applicable
 ```
 
 #### Q-17 how to get data from API and store in dataframe ?

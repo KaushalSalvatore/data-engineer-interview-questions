@@ -582,4 +582,11 @@ functionality, I prefer Python stored procedures."
 
 #### Q-20  Why is over-partitioning a Delta table dangerous ?
 ```bash
+Over-partitioning a Delta table is dangerous because it can create a huge number of small files and directories. 
+This increases metadata overhead, makes file listing expensive, creates many Spark tasks, and can actually make 
+queries and writes slower.
+
+1. Too many small files
+2. More metadata
+3. More Spark tasks
 ```
