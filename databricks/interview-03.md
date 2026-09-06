@@ -366,27 +366,184 @@ Common failures I would check :-
 
 #### Q-10 Two jobs simultaneously update the same Delta table. What happens ?
 ```bash
+The key concept is Optimistic Concurrency Control (OCC) 
+
+Suppose both jobs start at the same time:
+Delta Table = version 10
+
+Job A ────────┐
+              ├──> reads version 10
+Job B ────────┘
+
+then :-
+
+Job A → modifies customer 101
+Job B → modifies customer 101
+
+Step 1 — Job A commits first 
+
+Version 10 -> Job A -> Version 11 
+
+Step 2 — Job B tries to commit
+Job B started from version 10, but the table is now version 11.
+Delta checks whether Job A changed data that conflicts with Job B.
+If there is a conflict:
+Job B → COMMIT FAILED
+          ↓
+Concurrent modification/conflict
+Delta does not simply overwrite Job A's changes. Delta uses optimistic concurrency control and validates 
+conflicts during commit.
+
+Delta Lake supports concurrent writes using optimistic concurrency control. Suppose two jobs read the same Delta 
+table version and both try to update it. Delta allows both jobs to proceed without locking the table. At commit time, 
+it checks whether another transaction has modified data that conflicts with the current transaction. If there is no 
+conflict, the transaction commits as a new Delta version. If both jobs modify the same data, the later transaction can 
+fail with a concurrent modification conflict rather than silently overwriting the first transaction.
+
+If the jobs modify independent data, they may both succeed, and modern Databricks also provides row-level concurrency for supported tables to reduce unnecessary conflicts. In production, I would minimize overlapping writes, use appropriate 
+partition or predicate filters, and implement retry logic for transient concurrency failures.
 ```
 
 #### Q-11 Compare watermark, CDC and CDF ?
 ```bash
+Watermark = “Which records should I pick next? WHERE last_updated > previous_watermark
+CDC = “What exactly changed in the source? INSERT / UPDATE / DELETE
+CDF = “What changes happened in my Delta table? Delta Table → Changes
+
+CDF
+Suppose Bronze Delta is already updated using CDC.
+Instead of scanning the entire Bronze table every time:
+10 million rows
+you can consume only the changes recorded by CDF:
+620 changed records
+This makes downstream incremental processing much more efficient.
 ```
 
 #### Q-12 A CDC pipeline was down for 8 hours. How do you recover ?
 ```bash
+1. First check: Why did the pipeline fail?
+Before recovery, I identify the failure:- Kafka/CDC connector failure?, Source database connectivity?, Databricks job failure?
+ADLS permission issue?, Schema change?, Target Delta/MERGE failure?, Checkpoint corruption?, Infrastructure issue?
+
+2. Find the last successful CDC position: This is the most important step.
+SQL Server → LSN
+Oracle     → SCN
+MySQL      → Binlog position / GTID
+Kafka      → Topic + Partition + Offset
+
+3. Check whether the CDC log is still available
+4. Resume from the checkpoint
+5. What about duplicate records?
+6. Preserve CDC ordering
+7. Bronze is extremely useful here
+8. After catching up, perform reconciliation
+
+The interviewer wants to hear these 7 keywords:
+
+Checkpoint → Offset/LSN → Retention → Replay → Idempotency → Ordering → Reconciliation
 ```
 
 #### Q-13 Explain OPTIMIZE vs VACUUM vs clustering ?
 ```bash
+| Feature        | What it does                                             | Main purpose                            |
+| -------------- | -------------------------------------------------------- | --------------------------------------- |
+| **OPTIMIZE**   | Combines small files into larger files                   | Improve query/write performance         |
+| **VACUUM**     | Deletes old, unreferenced data files                     | Free storage                            |
+| **Clustering** | Organizes data based on columns commonly used in filters | Improve data skipping/query performance |
+
+OPTIMIZE = Organize files
+VACUUM = Remove old files
+Clustering = Organize data by query patterns
 ```
 
 #### Q-14 Explain managed tables vs external tables in Unity Catalog ? 
 ```bash
+1. Managed Table
+
+CREATE TABLE main.banking.customer (
+    customer_id BIGINT,
+    name STRING,
+    balance DECIMAL(18,2)
+)
+USING DELTA;
+
+I didn't specify a storage path.
+
+Databricks stores the table data in the configured managed storage location associated with the Unity Catalog 
+metastore/catalog/schema hierarchy.
+
+Unity Catalog
+     │
+     ├── Catalog
+     │      │
+     │      └── Schema
+     │             │
+     │             └── Managed Table
+     │                    │
+     │                    └── Data files
+     │                         managed storage
+
+What does Databricks manage :- Table metadata ,table location, access permissions, underlying data lifecycle
+
+2. External Table :- 
+
+CREATE TABLE main.banking.customer_ext
+USING DELTA
+LOCATION 'abfss://raw@bankstorage.dfs.core.windows.net/customer/';
+
+Now Unity Catalog knows:
+
+Table:
+main.banking.customer_ext
+
+Location:
+ADLS Gen2/customer/
+
+Managed:
+DROP TABLE
+   ↓
+Metadata + managed data lifecycle
+
+External:
+DROP TABLE
+   ↓
+Table registration removed
+   ↓
+External files remain
 ```
 
 #### Q-15 Design an end-to-end production CDC architecture ? 
 ```bash
+We have an OLTP banking database containing customer and account transactions. Whenever a customer is inserted, 
+updated, or deleted, we need to capture those changes and make them available in our cloud data platform with minimum 
+latency.
 
+I land the raw CDC events into ADLS Gen2 Bronze as immutable Delta data. I preserve metadata such as operation type, 
+event timestamp, source sequence/LSN, ingestion timestamp and event ID because these are important for ordering, 
+auditing and replay.
+
+In Databricks, I validate the schema, handle bad records, deduplicate events and process them into Silver. For the 
+target current-state table, I use Delta MERGE for INSERT, UPDATE and DELETE operations. If the business requires 
+historical tracking, I implement SCD Type 2 instead of simply overwriting the record.
+
+Important CDC metadata :-
+I don't store only business columns. I also capture metadata such as:
+
+customer_id
+name
+balance 
+
+operation
+event_timestamp
+ingestion_timestamp
+source_system
+transaction_id
+LSN / SCN
+batch_id
+
+operation = I = insert 
+D = delete
+U = update
 ```
 
 #### Q-16 You have 5 TB data in ADLS and your Databricks job takes 3 hours. How will you optimize it?
