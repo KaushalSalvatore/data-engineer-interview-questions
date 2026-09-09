@@ -86,47 +86,123 @@ Cool
 Archive/Delete depending on policy
 ```
 
-#### Q-6 What is the difference between soft delete, versioning, and snapshots in ADLS Gen2?
+#### Q-6 What is the difference between soft delete, versioning, and snapshots in ADLS Gen2 ?
 ```bash
+1. Soft Delete :- A developer accidentally deleted a Bronze-layer file. Instead of permanently losing it, I can 
+recover it during the soft-delete retention period.
+
+User deletes file
+       ↓
+File appears deleted
+       ↓
+Underlying deleted data is retained
+       ↓
+Restore if required
+
+2. Versioning :- Versioning keeps previous versions when a blob is modified or overwritten. If somebody accidentally 
+overwrites Version 3 with incorrect data, you can restore an earlier version.
+
+Versioning = history of changes to a blob.
+
+customer.csv
+Version 1 → 1000 customers
+
+customer.csv
+Version 2 → 1200 customers
+
+customer.csv
+Version 3 → 1500 customers
+
+3. Snapshots :- A snapshot is a point-in-time copy/state of a blob that you can use for recovery.
+10:00 AM → Snapshot 1
+12:00 PM → Snapshot 2
+03:00 PM → Snapshot 3
+If something goes wrong after 3 PM, you can use an earlier snapshot to recover the required state.
+Snapshot = "What did this data look like at this point in time"
 ```
 
-#### Q-7  How would you prevent accidental deletion of critical Gold-layer data by an engineer with write access?
+#### Q-7 How would you prevent accidental deletion of critical Gold-layer data by an engineer with write access ?
 ```bash
+1. Don't give Delete permission unnecessarily   
+2. Separate production and development access
+3. Enable soft delete
+4. Enable versioning where appropriate
+5. Use CI/CD and service principals for production writes
+6. Enable auditing and monitoring
+7. Have a recovery strategy
 ```
 
-#### Q-8 What is predicate pushdown, and how does file format choice affect it?
+#### Q-8 What is predicate pushdown, and how does file format choice affect it ?
 ```bash
+Predicate pushdown is an optimization where Spark pushes filter conditions closer to the data source. Instead 
+of reading the complete dataset and filtering afterward, the source can eliminate irrelevant data during the scan. 
+File format has a major impact. CSV and JSON generally provide limited opportunities for predicate pushdown, while 
+columnar formats like Parquet and ORC support it much better because they maintain column-level metadata and statistics. 
+In Databricks, Delta tables use Parquet underneath and can additionally benefit from data skipping and other Delta optimizations. This reduces I/O and improves query performance.
 ```
 
-#### Q-9 How do you optimize read/write throughput when loading large volumes of data from ADLS into Snowflake or Databricks?
+#### Q-9 How do you optimize read/write throughput when loading large volumes of data from ADLS into Snowflake or Databricks ?
 ```bash
+1. Optimize the data in ADLS first 
+I prefer Parquet/Delta instead of CSV/JSON for large-volume processing.
+
+2. Avoid too many small files
+256 MB – 1 GB per file
+
+3. Optimize Databricks read performance
+4. Control Spark parallelism
 ```
 
-#### Q-10 What is Data Lake Storage lifecycle management, and how would you configure it for a medallion architecture?
+#### Q-10 What is Data Lake Storage lifecycle management, and how would you configure it for a medallion architecture ?
 ```bash
+If a Bronze file hasn't been modified for 30 days, move it to Cool. After 90 days, move it to Archive. 
+Delete it after 7 years.
+
+Old files -> Cool -> Archive -> Delete
 ```
 
-#### Q-11 What's the difference between a Copy Activity and a Data Flow (Mapping Data Flow) in ADF when writing to ADLS?
+#### Q-11 What's the difference between a Copy Activity and a Data Flow (Mapping Data Flow) in ADF when writing to ADLS ?
 ```bash
+Copy Activity = move data
+Mapping Data Flow = transform data
+
+1. Copy Activity :- Copy Activity is mainly used for data ingestion/movement from source to destination.
+Azure SQL ->  Copy Activity -> ADLS Gen2 -> bronze/customer/
+
+2. Mapping Data Flow :- Mapping Data Flow is used when I need transformations while processing the data.
+Azure SQL -> Mapping Data Flow  -> Filter  -> Join -> Column -> Derived Column -> Aggregate -> ADLS
 ```
 
 #### Q-12 How would you set up a Snowflake external stage pointing to an ADLS Gen2 container, and load data with COPY INTO ?
 ```bash
+CREATE STORAGE INTEGRATION azure_adls_integration
+TYPE = EXTERNAL_STAGE
+STORAGE_PROVIDER = 'AZURE'
+ENABLED = TRUE
+AZURE_TENANT_ID = '<azure-tenant-id>'
+STORAGE_ALLOWED_LOCATIONS = (
+    'azure://mystorageaccount.blob.core.windows.net/data/'
+);
+
+
+Once the stage is created, I verify access using LIST and then load the files into a RAW table using COPY INTO. For example, 
+I can point COPY INTO to a specific date partition such as /sales/2026/09/, which supports incremental loading. Before production loading, I can use VALIDATION_MODE to identify file errors. I also monitor COPY history and Snowflake load 
+metadata to identify failed files and avoid unnecessarily reloading files.
 ```
 
-#### Q-13 Your ADF pipeline that writes to ADLS is failing intermittently with a "403 Forbidden" error, but only during certain hours of the day. How do you investigate?
+#### Q-13 Your ADF pipeline that writes to ADLS is failing intermittently with a "403 Forbidden" error, but only during certain hours of the day. How do you investigate ?
 ```bash
 ```
 
-#### Q-14 You need to migrate 50 TB of historical data from an on-prem NAS to ADLS Gen2 with minimal downtime. What approach do you take?
+#### Q-14 You need to migrate 50 TB of historical data from an on-prem NAS to ADLS Gen2 with minimal downtime. What approach do you take ?
 ```bash
 ```
 
-#### Q-15 Two different teams both need write access to the same Bronze container, but you need to prevent them from overwriting each other's files. How do you design this?
+#### Q-15 Two different teams both need write access to the same Bronze container, but you need to prevent them from overwriting each other's files. How do you design this ?
 ```bash
 ```
 
-#### Q-16 Your organization wants to reduce ADLS costs by 30% without impacting query performance on active data. What levers do you pull?
+#### Q-16 Your organization wants to reduce ADLS costs by 30% without impacting query performance on active data. What levers do you pull ?
 ```bash
 ```
 
