@@ -192,22 +192,130 @@ metadata to identify failed files and avoid unnecessarily reloading files.
 
 #### Q-13 Your ADF pipeline that writes to ADLS is failing intermittently with a "403 Forbidden" error, but only during certain hours of the day. How do you investigate ?
 ```bash
+1. First understand the architecture 
+Azure Data Factory ->  ADLS Gen2 -> /raw/customer/ 
+
+ADF Copy Activity fails:
+ADF
+ |
+ |---- 10:00 AM → SUCCESS
+ |
+ |---- 11:00 AM → 403
+ |
+ |---- 12:00 PM → 403
+ |
+ |---- 01:00 PM → SUCCESS
+
+ 2. Step 1 — Check the exact ADF error
+ 3. Step 2 — Compare successful vs failed runs
+ 4. Step 3 — Check ADLS firewall/network rules
+ 5. Why would firewall cause only certain hours?
+ 6. Step 4 — Check the Integration Runtime
+ 7 — Check whether something changes during those hours
+
+ If an ADF pipeline writing to ADLS Gen2 intermittently gets 403 only during certain hours, I wouldn't immediately 
+ assume an RBAC issue because a static permission problem would normally fail consistently. I would first capture 
+ the exact error code, request ID, activity run ID, timestamp and Integration Runtime from the failed Copy Activity.
+
+Then I would compare a successful run and a failed run to identify what changed — Integration Runtime, identity, 
+network path, target path or workload. My first checks would be the ADLS storage firewall and networking configuration, including public network access, selected networks, VNet rules, private endpoints and any scheduled security policies.
+Microsoft identifies network restrictions and insufficient identity permissions as key causes of ADLS Gen2 403 errors.
+
+Next, I would verify the ADF managed identity or service principal has the required RBAC role, such as Storage Blob Data Contributor for a destination, and I would also check ADLS Gen2 ACLs and execute/write permissions on the directory 
+hierarchy.
 ```
 
 #### Q-14 You need to migrate 50 TB of historical data from an on-prem NAS to ADLS Gen2 with minimal downtime. What approach do you take ?
 ```bash
+First, I would assess the migration
+
+Before copying anything, I would collect:
+
+Total size: 50 TB
+Number of files
+Average file size
+File types: CSV, Parquet, PDF, images, ZIP, etc.
+NAS protocol: SMB/NFS
+Current network bandwidth
+Network latency
+Number of files modified per day
+Whether files continue changing during migration
+Folder structure
+Security/ACL requirements
+Business downtime window
+
+I would split the migration into two phases
+Phase 1 — Bulk migration
+Day 1 ──────────────── Day 5
+       Bulk Migration
+
+NAS ───────────────────────► ADLS
+     50 TB historical data
+
+Phase 2 — Delta / changed-file migration
+Files created after initial copy
+Files modified after initial copy
+Files deleted after initial copy
+
+ADF pipeline design :- I would create a metadata-driven migration pipeline instead of creating hundreds of individual Copy Activities.
 ```
 
 #### Q-15 Two different teams both need write access to the same Bronze container, but you need to prevent them from overwriting each other's files. How do you design this ?
 ```bash
+I would not give both teams unrestricted write access to the same physical directory. I would give them separate landing 
+folders inside the same Bronze container and control access using Microsoft Entra groups + ADLS Gen2 ACLs.
+
+1. My preferred design
+Team A = Customer Data
+Team B = Transaction Data
+
+bronze/
+│
+├── team-a/
+│   ├── customer/
+│   └── account/
+│
+└── team-b/
+    ├── transaction/
+    └── payment/
+
+Another important design: immutable Bronze :-
+
+/bronze/team-a/customer/
+    ingest_date=2026-09-10/
+       customer_1001_20260910.csv
+
+    ingest_date=2026-09-11/
+       customer_1001_20260911.csv   
 ```
 
 #### Q-16 Your organization wants to reduce ADLS costs by 30% without impacting query performance on active data. What levers do you pull ?
 ```bash
+Keep frequently queried data in Hot, automatically move older/infrequently accessed data to Cool/Cold, clean up unnecessary versions/snapshots, optimize file sizes and formats, and review redundancy.
 ```
 
 #### Q-17 You run df.write.parquet(path) in Spark and get an error: "Path already exists." How do you resolve it, and what are the trade-offs of each fix ?
 ```bash
+Default behavior = “I won't accidentally destroy existing data.”
+
+Option 1 — overwrite
+df.write \
+  .mode("overwrite") \
+  .parquet("/data/customer")
+
+Option 2 — append
+df.write \
+  .mode("append") \
+  .parquet("/data/customer")
+
+Option 3 — ignore
+df.write \
+  .mode("ignore") \
+  .parquet("/data/customer")
+
+Option 4 — Write to a unique/partitioned path
+/data/customer/date=2026-09-08/
+/data/customer/date=2026-09-09/
 ```
 
 #### Q-18
